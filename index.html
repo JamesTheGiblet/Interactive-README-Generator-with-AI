@@ -477,29 +477,26 @@
                                 <button type="button" id="copyBtn" class="copy-btn">📋 Copy Markdown</button>
 
                             </div>
-
-                            <div class="form-group">
-
-                                <label for="resultTone">Change Tone & Regenerate:</label>
-
-                                <select id="resultTone">
-
-                                    <option value="professional">Professional & Polished</option>
-
-                                    <option value="friendly">Friendly & Casual</option>
-
-                                    <option value="technical">Technical & Formal</option>
-
-                                    <option value="playful">Playful & Creative</option>
-
-                                    <option value="ai-decide">Let AI Decide</option>
-
-                                    <option value="custom">Custom...</option>
-
-                                </select>
-
+                            <div class="result-options">
+                                <div class="form-group">
+                                    <label for="resultTone">Change Tone:</label>
+                                    <select id="resultTone">
+                                        <option value="professional">Professional & Polished</option>
+                                        <option value="friendly">Friendly & Casual</option>
+                                        <option value="technical">Technical & Formal</option>
+                                        <option value="playful">Playful & Creative</option>
+                                        <option value="ai-decide">Let AI Decide</option>
+                                        <option value="custom">Custom...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preview Theme:</label>
+                                    <div class="button-group-toggle">
+                                        <button type="button" class="btn-secondary" id="previewThemeDarkBtn">Dark</button>
+                                        <button type="button" class="btn-secondary" id="previewThemeLightBtn">Light</button>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
 
                         <div class="form-group" id="resultCustomToneGroup">
@@ -697,9 +694,8 @@
     </div>
 
 
-
+    <script src="security.js"></script>
     <script src="app.js"></script>
-
     <script src="examples.js"></script>
 
 </body>

@@ -28,7 +28,6 @@ const ReadmeGenerator = {
     },
     config: {
         totalSteps: 6,
-        OBFUSCATION_KEY: 'a-not-so-secret-key-for-obfuscation',
     },
 
     // INITIALIZATION
@@ -98,7 +97,7 @@ const ReadmeGenerator = {
         // Initial Data Load
         this.storage.loadDraft();
         this.storage.loadTemplates();
-        this.storage.loadApiKeyFromStorage();
+        await this.storage.loadApiKeyFromStorage();
         this.ui.updateApiHelpText();
         this.ui.showStep(this.state.currentStep);
 
@@ -653,32 +652,6 @@ Generate only the README content in valid Markdown format, nothing else.`;
     // STORAGE METHODS
     //================================================================
     storage: {
-        obfuscate: function(text) {
-            const self = ReadmeGenerator;
-            if (!text) return '';
-            let result = '';
-            for (let i = 0; i < text.length; i++) {
-                result += String.fromCharCode(text.charCodeAt(i) ^ self.config.OBFUSCATION_KEY.charCodeAt(i % self.config.OBFUSCATION_KEY.length));
-            }
-            return btoa(result);
-        },
-
-        deobfuscate: function(text) {
-            const self = ReadmeGenerator;
-            if (!text) return '';
-            try {
-                const decodedText = atob(text);
-                let result = '';
-                for (let i = 0; i < decodedText.length; i++) {
-                    result += String.fromCharCode(decodedText.charCodeAt(i) ^ self.config.OBFUSCATION_KEY.charCodeAt(i % self.config.OBFUSCATION_KEY.length));
-                }
-                return result;
-            } catch (e) {
-                console.warn("Could not deobfuscate API key, it might be in plain text.", e);
-                return text;
-            }
-        },
-
         saveDraft: function() {
             const self = ReadmeGenerator;
             if (document.getElementById('result').style.display === 'block' || document.getElementById('loading').style.display === 'block') {
@@ -719,13 +692,13 @@ Generate only the README content in valid Markdown format, nothing else.`;
             }
         },
 
-        handleApiKeyStorage: function() {
-            const self = ReadmeGenerator;
+        handleApiKeyStorage: async function() {
             const remember = document.getElementById('rememberApiKey').checked;
             const apiKey = document.getElementById('apiKey').value.trim();
             if (remember && apiKey) {
+                const encryptedKey = await SecurityModule.encryptData(apiKey);
                 localStorage.setItem('apiProvider', document.getElementById('apiProvider').value);
-                localStorage.setItem('apiKey', self.storage.obfuscate(apiKey));
+                localStorage.setItem('apiKey', encryptedKey);
                 localStorage.setItem('rememberApiKey', 'true');
             } else if (!remember) {
                 localStorage.removeItem('apiProvider');
@@ -734,18 +707,17 @@ Generate only the README content in valid Markdown format, nothing else.`;
             }
         },
 
-        loadApiKeyFromStorage: function() {
-            const self = ReadmeGenerator;
+        loadApiKeyFromStorage: async function() {
             if (localStorage.getItem('rememberApiKey') === 'true') {
                 const provider = localStorage.getItem('apiProvider');
-                const obfuscatedKey = localStorage.getItem('apiKey');
+                const encryptedKey = localStorage.getItem('apiKey');
                 
-                if (provider && obfuscatedKey) {
-                    const key = self.storage.deobfuscate(obfuscatedKey);
+                if (provider && encryptedKey) {
+                    const key = await SecurityModule.decryptData(encryptedKey);
                     document.getElementById('apiProvider').value = provider;
                     document.getElementById('apiKey').value = key;
                     document.getElementById('rememberApiKey').checked = true;
-                    self.ui.updateApiHelpText();
+                    ReadmeGenerator.ui.updateApiHelpText();
                 }
             }
         },
@@ -1338,7 +1310,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
             self.ui.showStep(1);
             return;
         }
-        self.storage.handleApiKeyStorage();
+        await self.storage.handleApiKeyStorage();
 
         const data = self.utils.collectFormData();
         self.state.lastFormData = data;
