@@ -46,13 +46,15 @@ const ReadmeGenerator = {
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         });
 
+        MarkdownRenderer.init();
+        ModalManager.init();
+
         // Event Listeners
         document.getElementById('tone').addEventListener('change', (e) => {
             document.getElementById('customToneGroup').style.display = e.target.value === 'custom' ? 'block' : 'none';
         });
 
-        // Use event delegation for form inputs to improve performance
-        const debouncedUpdate = this.utils.debounce(() => {
+        const debouncedUpdate = utils.debounce(() => {
             this.storage.saveDraft();
             this.ui.updateLivePreview();
         }, 500);
@@ -76,30 +78,13 @@ const ReadmeGenerator = {
 
         this.events.setupKeyboardNavigation();
 
-        // Insights Modal Listeners
-        document.getElementById('insightsBtn').addEventListener('click', () => this.ui.showInsightsModal());
-        document.getElementById('modalCloseBtn').addEventListener('click', () => this.ui.hideInsightsModal());
-        window.addEventListener('click', (event) => {
-            if (event.target == document.getElementById('insightsModal')) {
-                this.ui.hideInsightsModal();
-            }
-        });
-        document.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const tabId = button.dataset.tab;
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                button.classList.add('active');
-                document.getElementById(`tab-${tabId}`).classList.add('active');
-            });
-        });
-
         // Initial Data Load
         this.storage.loadDraft();
         this.storage.loadTemplates();
         await this.storage.loadApiKeyFromStorage();
         this.ui.updateApiHelpText();
         this.ui.showStep(this.state.currentStep);
+        PerformanceOptimizer.init();
 
         await this.events.handleShareableLink();
     },
@@ -172,7 +157,8 @@ const ReadmeGenerator = {
             if (self.state.currentStep > 1 && self.state.currentStep <= self.config.totalSteps) {
                 const formData = self.utils.collectFormData();
                 const draftMarkdown = self.ui.generateDraftMarkdown(formData);
-                document.getElementById('live-preview').innerHTML = marked.parse(draftMarkdown);
+                const livePreviewEl = document.getElementById('live-preview'); 
+                MarkdownRenderer.render(draftMarkdown, livePreviewEl);
             }
         },
 
@@ -222,21 +208,8 @@ const ReadmeGenerator = {
             document.getElementById('result').style.display = 'block';
             localStorage.removeItem('readmeGenerator_draft');
             
-            try {
-                await self.utils.loadHighlightJS();
-                marked.setOptions({
-                    highlight: function (code, lang) {
-                        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-                        return hljs.highlight(code, { language, ignoreIllegals: true }).value;
-                    }
-                });
-            } catch (error) {
-                console.error("Failed to load highlight.js for syntax highlighting.", error);
-                marked.setOptions({ highlight: false });
-            }
-
             const preview = document.getElementById('preview');
-            preview.innerHTML = marked.parse(readme);
+            await MarkdownRenderer.render(readme, preview);
             
             self.ui.setupDownload(readme);
 
@@ -245,8 +218,8 @@ const ReadmeGenerator = {
             copyBtn.textContent = '📋 Copy Markdown';
             copyBtn.disabled = false;
 
-            document.getElementById('pdfBtn').onclick = () => self.utils.exportToPDF();
-            document.getElementById('htmlBtn').onclick = () => self.utils.exportToHTML();
+            document.getElementById('pdfBtn').onclick = () => self.utils.exportToPDF(readme);
+            document.getElementById('htmlBtn').onclick = () => self.utils.exportToHTML(readme);
 
             const shareBtn = document.getElementById('shareBtn');
             shareBtn.onclick = () => self.utils.generateShareableLink();
@@ -335,20 +308,6 @@ const ReadmeGenerator = {
             document.getElementById('navigation').style.display = 'flex';
             self.ui.showStep(self.config.totalSteps);
             self.ui.hideError();
-        },
-
-        /**
-         * Shows the insights and statistics modal.
-         */
-        showInsightsModal: function() {
-            document.getElementById('insightsModal').style.display = 'block';
-        },
-
-        /**
-         * Hides the insights and statistics modal.
-         */
-        hideInsightsModal: function() {
-            document.getElementById('insightsModal').style.display = 'none';
         },
 
         /**
@@ -913,11 +872,14 @@ Generate only the README content in valid Markdown format, nothing else.`;
                 document.getElementById('abTestResult').style.display = 'block';
 
                 // Populate A/B test view
+                const abPreview1 = document.getElementById('abPreview1');
+                const abPreview2 = document.getElementById('abPreview2');
+
                 document.getElementById('abColumn1Header').textContent = originalProvider === 'gemini' ? 'Gemini Result' : 'OpenAI Result';
-                document.getElementById('abPreview1').innerHTML = marked.parse(self.state.generatedReadme);
+                await MarkdownRenderer.render(self.state.generatedReadme, abPreview1);
 
                 document.getElementById('abColumn2Header').textContent = alternateProvider === 'gemini' ? 'Gemini Result' : 'OpenAI Result';
-                document.getElementById('abPreview2').innerHTML = marked.parse(alternateReadme);
+                await MarkdownRenderer.render(alternateReadme, abPreview2);
 
             } catch (error) {
                 console.error('A/B Test Error:', error);
@@ -1019,52 +981,6 @@ Generate only the README content in valid Markdown format, nothing else.`;
      */
     utils: {
         /**
-         * Sanitizes user input to prevent XSS by escaping HTML characters.
-         * @param {string} text - The text to sanitize.
-         * @returns {string} The sanitized text.
-         */
-        sanitizeInput: function(text) {
-            if (typeof text !== 'string') return text;
-            const tempDiv = document.createElement('div');
-            tempDiv.textContent = text;
-            return tempDiv.innerHTML;
-        },
-        
-        /**
-         * Creates a debounced function that delays invoking `func` until after `delay` milliseconds
-         * have elapsed since the last time the debounced function was invoked.
-         * @param {Function} func - The function to debounce.
-         * @param {number} delay - The number of milliseconds to delay.
-         * @returns {Function} The new debounced function.
-         */
-        debounce: function(func, delay) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
-            };
-        },
-
-        /**
-         * Lazily loads the highlight.js library to improve initial page load performance.
-         * The script is only fetched when the result view is shown.
-         * @returns {Promise<void>} A promise that resolves when the script is loaded.
-         */
-        loadHighlightJS: function() {
-            return new Promise((resolve, reject) => {
-                if (window.hljs) {
-                    return resolve();
-                }
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';
-                script.onload = resolve;
-                script.onerror = () => reject(new Error('Failed to load highlight.js script.'));
-                document.head.appendChild(script);
-            });
-        },
-
-        /**
          * Validates the format of an API key based on the provider.
          * @param {string} provider - The AI provider ('openai' or 'gemini').
          * @param {string} key - The API key to validate.
@@ -1096,7 +1012,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
             if (step === 1) {
                 const apiKey = document.getElementById('apiKey').value.trim();
                 const apiProvider = document.getElementById('apiProvider').value;
-                const validationResult = self.utils.validateApiKeyFormat(apiProvider, apiKey);
+                const validationResult = this.validateApiKeyFormat(apiProvider, apiKey);
                 if (!validationResult.valid) {
                     self.ui.showError(validationResult.message);
                     return false;
@@ -1130,38 +1046,29 @@ Generate only the README content in valid Markdown format, nothing else.`;
          * @returns {object} An object containing all the form data.
          */
         collectFormData: function() {
-            const self = ReadmeGenerator;
             const data = {};
             const formElements = document.getElementById('readmeForm').elements;
 
             for (const element of formElements) {
-                // Skip elements without a name or buttons
-                if (!element.name || element.type === 'button') continue;
+                if (!element.id || element.type === 'button' || element.type === 'submit') continue;
 
-                const name = element.name;
-                const value = element.value;
+                const name = element.id;
+                let value = element.value;
 
-                switch (element.type) {
-                    case 'checkbox':
-                        data[name] = element.checked;
-                        break;
-                    case 'radio':
-                        if (element.checked) {
-                            data[name] = self.utils.sanitizeInput(value);
-                        }
-                        break;
-                    default:
-                        data[name] = self.utils.sanitizeInput(typeof value === 'string' ? value.trim() : value);
+                if (element.type === 'checkbox') {
+                    data[name] = element.checked;
+                } else {
+                    data[name] = utils.sanitizeInput(typeof value === 'string' ? value.trim() : value);
                 }
             }
 
             // Handle special case for custom tone
             if (data.tone === 'custom') {
-                data.tone = self.utils.sanitizeInput(formElements.customTone.value.trim()) || 'professional';
+                data.tone = utils.sanitizeInput(formElements.customTone.value.trim()) || 'professional';
             }
 
-            // This checkbox is for UI state, not for the AI prompt
-            delete data.rememberApiKey;
+            // Add apiKey separately as it's not part of the form data for prompts
+            data.apiKey = document.getElementById('apiKey').value.trim();
 
             return data;
         },
@@ -1172,7 +1079,6 @@ Generate only the README content in valid Markdown format, nothing else.`;
          * @param {Partial<FormData>} data - The data object to populate the form with.
          */
         populateForm: function(data) {
-            const self = ReadmeGenerator;
             const formElements = document.getElementById('readmeForm').elements;
 
             // Set default values for checkboxes that might be undefined in old drafts
@@ -1190,7 +1096,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
                     if (element) {
                         if (element.type === 'checkbox') {
                             element.checked = !!finalData[key];
-                        } else if (element.name) { // Check for name to avoid issues with fieldsets etc.
+                        } else if (element.id) { // Check for id to avoid issues with fieldsets etc.
                             element.value = finalData[key];
                         }
                     }
@@ -1210,7 +1116,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
             }
             
             // Trigger UI updates that depend on form values
-            self.ui.updateFieldVisibility();
+            ReadmeGenerator.ui.updateFieldVisibility();
             document.getElementById('customToneGroup').style.display = toneSelect.value === 'custom' ? 'block' : 'none';
         },
 
@@ -1266,7 +1172,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
         /**
          * Exports the generated README preview as a PDF file.
          */
-        exportToPDF: function() {
+        exportToPDF: function(readme) {
             const element = document.getElementById('preview');
             const opt = {
                 margin: 0.5,
@@ -1281,14 +1187,13 @@ Generate only the README content in valid Markdown format, nothing else.`;
         /**
          * Exports the generated README as a self-contained HTML file.
          */
-        exportToHTML: function() {
-            const self = ReadmeGenerator;
-            if (!self.state.generatedReadme) return;
+        exportToHTML: function(readme) {
+            if (!readme) return;
             const fullHtml = `
                 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>README</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
                 <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";max-width:800px;margin:40px auto;padding:20px;line-height:1.6;color:#333}pre{background:#1f2937;color:#f3f4f6;padding:1em;border-radius:8px}code{font-family:'Courier New',Courier,monospace}img{max-width:100%}</style>
-                </head><body>${marked.parse(self.state.generatedReadme)}</body></html>`;
+                </head><body>${marked.parse(readme)}</body></html>`;
             const blob = new Blob([fullHtml], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
