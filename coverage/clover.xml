@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1756933192231" clover="3.2.0">
-  <project timestamp="1756933192231" name="All files">
-    <metrics statements="1020" coveredstatements="329" conditionals="561" coveredconditionals="135" methods="186" coveredmethods="41" elements="1767" coveredelements="505" complexity="0" loc="1020" ncloc="1020" packages="1" files="14" classes="14"/>
+<coverage generated="1756934307987" clover="3.2.0">
+  <project timestamp="1756934307987" name="All files">
+    <metrics statements="1022" coveredstatements="371" conditionals="563" coveredconditionals="142" methods="186" coveredmethods="45" elements="1771" coveredelements="558" complexity="0" loc="1022" ncloc="1022" packages="1" files="14" classes="14"/>
     <file name="accessibility.js" path="C:\Users\gilbe\Documents\GitHub\Interactive-README-Generator-with-AI-Pro\src\modules\accessibility.js">
       <metrics statements="48" coveredstatements="0" conditionals="36" coveredconditionals="0" methods="9" coveredmethods="0"/>
       <line num="1" count="0" type="stmt"/>
@@ -148,7 +148,7 @@
       <line num="245" count="1" type="stmt"/>
     </file>
     <file name="app.js" path="C:\Users\gilbe\Documents\GitHub\Interactive-README-Generator-with-AI-Pro\src\modules\app.js">
-      <metrics statements="172" coveredstatements="4" conditionals="54" coveredconditionals="0" methods="23" coveredmethods="0"/>
+      <metrics statements="174" coveredstatements="46" conditionals="56" coveredconditionals="7" methods="23" coveredmethods="4"/>
       <line num="7" count="1" type="stmt"/>
       <line num="8" count="0" type="stmt"/>
       <line num="10" count="0" type="cond" truecount="0" falsecount="4"/>
@@ -158,40 +158,40 @@
       <line num="17" count="0" type="cond" truecount="0" falsecount="4"/>
       <line num="18" count="0" type="stmt"/>
       <line num="22" count="1" type="stmt"/>
-      <line num="43" count="0" type="stmt"/>
-      <line num="46" count="0" type="stmt"/>
-      <line num="49" count="0" type="stmt"/>
+      <line num="43" count="1" type="stmt"/>
+      <line num="46" count="1" type="stmt"/>
+      <line num="49" count="1" type="stmt"/>
       <line num="50" count="0" type="stmt"/>
       <line num="52" count="0" type="stmt"/>
       <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="56" count="0" type="stmt"/>
-      <line num="57" count="0" type="stmt"/>
-      <line num="58" count="0" type="stmt"/>
-      <line num="61" count="0" type="stmt"/>
+      <line num="56" count="1" type="stmt"/>
+      <line num="57" count="1" type="stmt"/>
+      <line num="58" count="1" type="stmt"/>
+      <line num="61" count="1" type="stmt"/>
       <line num="62" count="0" type="stmt"/>
-      <line num="65" count="0" type="stmt"/>
+      <line num="65" count="1" type="stmt"/>
       <line num="66" count="0" type="stmt"/>
       <line num="67" count="0" type="stmt"/>
-      <line num="69" count="0" type="stmt"/>
+      <line num="69" count="1" type="stmt"/>
       <line num="70" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="71" count="0" type="stmt"/>
-      <line num="75" count="0" type="stmt"/>
-      <line num="76" count="0" type="stmt"/>
-      <line num="77" count="0" type="stmt"/>
-      <line num="80" count="0" type="stmt"/>
+      <line num="75" count="1" type="stmt"/>
+      <line num="76" count="1" type="stmt"/>
+      <line num="77" count="1" type="stmt"/>
+      <line num="80" count="1" type="stmt"/>
       <line num="81" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="82" count="0" type="stmt"/>
       <line num="84" count="0" type="stmt"/>
-      <line num="89" count="0" type="stmt"/>
-      <line num="90" count="0" type="stmt"/>
-      <line num="91" count="0" type="stmt"/>
-      <line num="92" count="0" type="stmt"/>
-      <line num="93" count="0" type="stmt"/>
-      <line num="94" count="0" type="stmt"/>
-      <line num="96" count="0" type="stmt"/>
-      <line num="104" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="105" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="106" count="0" type="stmt"/>
+      <line num="89" count="1" type="stmt"/>
+      <line num="90" count="1" type="stmt"/>
+      <line num="91" count="1" type="stmt"/>
+      <line num="92" count="1" type="stmt"/>
+      <line num="93" count="1" type="stmt"/>
+      <line num="94" count="1" type="stmt"/>
+      <line num="96" count="1" type="stmt"/>
+      <line num="104" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="105" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="106" count="1" type="stmt"/>
       <line num="112" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="113" count="0" type="stmt"/>
       <line num="118" count="0" type="stmt"/>
@@ -285,7 +285,7 @@
       <line num="263" count="0" type="stmt"/>
       <line num="264" count="0" type="stmt"/>
       <line num="265" count="0" type="stmt"/>
-      <line num="269" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="269" count="1" type="cond" truecount="1" falsecount="1"/>
       <line num="270" count="0" type="stmt"/>
       <line num="271" count="0" type="stmt"/>
       <line num="272" count="0" type="stmt"/>
@@ -300,27 +300,29 @@
       <line num="286" count="0" type="stmt"/>
       <line num="287" count="0" type="stmt"/>
       <line num="289" count="0" type="stmt"/>
-      <line num="297" count="0" type="stmt"/>
-      <line num="298" count="0" type="stmt"/>
-      <line num="299" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="300" count="0" type="stmt"/>
-      <line num="301" count="0" type="stmt"/>
-      <line num="302" count="0" type="stmt"/>
-      <line num="304" count="0" type="stmt"/>
-      <line num="306" count="0" type="stmt"/>
-      <line num="307" count="0" type="stmt"/>
-      <line num="310" count="0" type="stmt"/>
-      <line num="316" count="0" type="stmt"/>
-      <line num="318" count="0" type="stmt"/>
-      <line num="319" count="0" type="stmt"/>
-      <line num="320" count="0" type="stmt"/>
-      <line num="322" count="0" type="stmt"/>
-      <line num="323" count="0" type="stmt"/>
+      <line num="297" count="2" type="stmt"/>
+      <line num="298" count="2" type="stmt"/>
+      <line num="299" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="300" count="1" type="stmt"/>
+      <line num="301" count="1" type="stmt"/>
+      <line num="302" count="1" type="stmt"/>
+      <line num="304" count="1" type="stmt"/>
+      <line num="306" count="1" type="stmt"/>
+      <line num="307" count="1" type="stmt"/>
+      <line num="310" count="1" type="stmt"/>
+      <line num="316" count="1" type="stmt"/>
+      <line num="318" count="1" type="stmt"/>
+      <line num="319" count="1" type="stmt"/>
+      <line num="320" count="1" type="stmt"/>
+      <line num="322" count="1" type="stmt"/>
+      <line num="323" count="1" type="stmt"/>
       <line num="326" count="0" type="stmt"/>
       <line num="327" count="0" type="stmt"/>
       <line num="329" count="0" type="stmt"/>
-      <line num="334" count="1" type="stmt"/>
-      <line num="335" count="0" type="stmt"/>
+      <line num="335" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="336" count="1" type="stmt"/>
+      <line num="339" count="1" type="stmt"/>
+      <line num="340" count="0" type="stmt"/>
     </file>
     <file name="build.js" path="C:\Users\gilbe\Documents\GitHub\Interactive-README-Generator-with-AI-Pro\src\modules\build.js">
       <metrics statements="13" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>

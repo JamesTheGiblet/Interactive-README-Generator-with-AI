@@ -79,7 +79,11 @@ describe('app.js - ReadmeGenerator', () => {
                             <input id="apiKey" value="test-key">
                             <select id="apiProvider"><option value="openai"></option></select>
                             <input id="githubRepoUrl">
+                            <input id="githubPat">
                             <button id="analyzeRepoBtn"></button>
+                        </div>
+                        <div data-step="2">
+                            <select id="projectType"><option value="web-app">Web App</option></select>
                         </div>
                         <div data-step="6"></div>
                         <select id="tone"><option value="professional"></option><option value="custom"></option></select>
