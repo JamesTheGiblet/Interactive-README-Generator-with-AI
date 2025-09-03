@@ -35,22 +35,15 @@ const ReadmeGenerator = {
     init: async function() {
         // Theme switcher logic
         const themeCheckbox = document.getElementById('theme-checkbox');
-        const savedTheme = localStorage.getItem('theme'); 
 
-        // Set initial theme based on saved preference or OS setting
-        if (savedTheme) {
-            document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-            themeCheckbox.checked = (savedTheme === 'dark');
-        } else {
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.classList.toggle('dark-mode', prefersDark);
-            themeCheckbox.checked = prefersDark;
-        }
+        // The <head> script has already set the theme. We just need to sync the checkbox state.
+        themeCheckbox.checked = document.documentElement.classList.contains('dark-theme');
 
         // Update theme on toggle
         themeCheckbox.addEventListener('change', () => {
             const isDarkMode = themeCheckbox.checked;
-            document.body.classList.toggle('dark-mode', isDarkMode);
+            // Toggle the class on the <html> element to match the CSS and the initial script
+            document.documentElement.classList.toggle('dark-theme', isDarkMode);
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
         });
 
@@ -261,6 +254,15 @@ const ReadmeGenerator = {
             shareBtn.textContent = '🔗 Share Link';
             shareBtn.disabled = false;
 
+            // Setup Preview Theme Toggle
+            const appTheme = document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light';
+            const savedPreviewTheme = localStorage.getItem('readmePreviewTheme');
+            const initialPreviewTheme = savedPreviewTheme || appTheme; // Use saved, or default to app theme
+            self.ui.setPreviewTheme(initialPreviewTheme);
+
+            document.getElementById('previewThemeLightBtn').onclick = () => self.ui.setPreviewTheme('light');
+            document.getElementById('previewThemeDarkBtn').onclick = () => self.ui.setPreviewTheme('dark');
+
             const saveTemplateBtn = document.querySelector('.result .button-group button[onclick="ReadmeGenerator.saveTemplate()"]');
             saveTemplateBtn.textContent = '💾 Save as Template';
             saveTemplateBtn.disabled = false;
@@ -308,6 +310,23 @@ const ReadmeGenerator = {
             resultToneSelect.disabled = false;
             downloadBtn.style.pointerEvents = 'auto';
             downloadBtn.style.opacity = '1';
+        },
+
+        setPreviewTheme: function(theme) {
+            const preview = document.getElementById('preview');
+            const lightBtn = document.getElementById('previewThemeLightBtn');
+            const darkBtn = document.getElementById('previewThemeDarkBtn');
+            const lightHljs = document.getElementById('hljs-light-theme');
+            const darkHljs = document.getElementById('hljs-dark-theme');
+
+            preview.classList.toggle('preview-light-theme', theme === 'light');
+            preview.classList.toggle('preview-dark-theme', theme === 'dark');
+            lightBtn.classList.toggle('active', theme === 'light');
+            darkBtn.classList.toggle('active', theme === 'dark');
+            lightHljs.disabled = (theme !== 'light');
+            darkHljs.disabled = (theme !== 'dark');
+
+            localStorage.setItem('readmePreviewTheme', theme);
         },
 
         editDetails: function() {

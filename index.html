@@ -10,9 +10,24 @@
 
     <title>README Generator - Powered by Gemini AI</title>
 
+    <script>
+        // This script runs before the page is rendered to set the theme.
+        // It prevents a "flash of the wrong theme" by checking localStorage and system preferences.
+        (function() {
+            const storedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            // Use stored theme if it exists, otherwise use system preference.
+            if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark-theme');
+            }
+        })();
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark-theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light-theme" disabled>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
