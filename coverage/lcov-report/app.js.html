@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">2.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/179</span>
+                <span class='fraction'>4/179</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">2.32% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/172</span>
+                <span class='fraction'>4/172</span>
             </div>
         
             
@@ -405,22 +405,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -732,7 +732,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//================================================================
@@ -741,7 +741,7 @@
 // These listeners catch any unexpected errors that might not be handled by
 // specific try/catch blocks, preventing the application from crashing silently.
 &nbsp;
-<span class="cstat-no" title="statement not covered" >window.addEventListener('unhandledrejection', <span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {</span>
+window.addEventListener('unhandledrejection', <span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {
 <span class="cstat-no" title="statement not covered" >    console.error('Unhandled Promise Rejection:', event.reason);</span>
     // Check if the UI is available to display the error
 <span class="cstat-no" title="statement not covered" >    if (window.ReadmeGenerator &amp;&amp; ReadmeGenerator.ui) {</span>
@@ -749,14 +749,14 @@
     }
 });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >window.addEventListener('error', <span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {</span>
+window.addEventListener('error', <span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {
 <span class="cstat-no" title="statement not covered" >    console.error('Global Error:', event.error);</span>
 <span class="cstat-no" title="statement not covered" >    if (window.ReadmeGenerator &amp;&amp; ReadmeGenerator.ui) {</span>
 <span class="cstat-no" title="statement not covered" >        ReadmeGenerator.ui.showError('A critical error occurred. Please refresh the page.');</span>
     }
 });
 &nbsp;
-const ReadmeGenerator = <span class="cstat-no" title="statement not covered" >{</span>
+const ReadmeGenerator = {
     // STATE &amp; CONFIG
     state: {
         currentStep: 1,
@@ -1068,7 +1068,7 @@ const ReadmeGenerator = <span class="cstat-no" title="statement not covered" >{<
     },
 };
  
-<span class="cstat-no" title="statement not covered" >document.addEventListener('DOMContentLoaded', <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+document.addEventListener('DOMContentLoaded', <span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >    ReadmeGenerator.init();</span>
 });
 &nbsp;</pre></td></tr></table></pre>
@@ -1078,7 +1078,7 @@ const ReadmeGenerator = <span class="cstat-no" title="statement not covered" >{<
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-03T20:38:27.434Z
+                at 2025-09-03T20:59:52.087Z
             </div>
         <script src="prettify.js"></script>
         <script>

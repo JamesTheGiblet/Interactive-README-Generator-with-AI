@@ -331,6 +331,11 @@ const ReadmeGenerator = {
     },
 };
  
+// Make it available globally for the browser and for tests
+if (typeof window !== 'undefined') {
+    window.ReadmeGenerator = ReadmeGenerator;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     ReadmeGenerator.init();
 });

@@ -167,3 +167,7 @@ const storage = {
         }
     },
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { storage };
+}
