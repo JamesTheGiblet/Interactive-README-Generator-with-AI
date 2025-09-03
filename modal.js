@@ -2,6 +2,7 @@ const ModalManager = {
     init: function() {
         this.setupInsightsModal();
         this.setupExamplesModal();
+        this.setupGithubSyncModal();
     },
 
     setupInsightsModal: function() {
@@ -46,6 +47,24 @@ const ModalManager = {
         examplesModal.addEventListener('click', (e) => {
             if (e.target === examplesModal) {
                 this.hide(examplesModal);
+            }
+        });
+    },
+
+    setupGithubSyncModal: function() {
+        const syncModal = document.getElementById('githubSyncModal');
+        if (!syncModal) return;
+
+        document.getElementById('syncWithGithubBtn').addEventListener('click', () => this.show(syncModal));
+        
+        // Close buttons
+        document.getElementById('githubSyncModalCloseBtn').addEventListener('click', () => this.hide(syncModal));
+        document.getElementById('closeSyncModalBtn').addEventListener('click', () => this.hide(syncModal));
+        
+        // Close on overlay click
+        syncModal.addEventListener('click', (event) => {
+            if (event.target === syncModal) {
+                this.hide(syncModal);
             }
         });
     },

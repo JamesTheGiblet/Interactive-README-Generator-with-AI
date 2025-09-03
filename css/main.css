@@ -370,6 +370,25 @@ textarea {
     color: var(--text-color-light);
 }
 
+.github-analysis-box {
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    border-radius: var(--border-radius);
+}
+
+.github-analysis-box legend {
+    font-weight: 600;
+    padding: 0 10px;
+    margin-left: 10px;
+}
+
+.github-analysis-box .form-group {
+    margin-bottom: 15px;
+}
+
+
 /* ==========================================================================
    7. BUTTONS
    ========================================================================== */

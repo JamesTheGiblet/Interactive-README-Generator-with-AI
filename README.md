@@ -29,11 +29,35 @@ README Pro integrates directly with your source code and development tools. It a
 
 ## Pro Features in Detail
 
-- 🚀 **Direct GitHub Integration:** Authenticate with GitHub, select a repository, and let the AI read your code, dependencies, and file structure to automatically pre-fill the entire questionnaire with high accuracy. Push the final README directly back to your repo with a single click.
+- 🚀 **Direct GitHub Repo Analysis:** Provide a GitHub repository URL and let the AI analyze your file structure, dependencies, and source code to automatically generate a complete, high-quality README.
 - 💻 **Powerful CLI Tool:** Use `readme-pro generate` to create READMEs locally or integrate it into your CI/CD pipelines to ensure every new project is instantly documented.
-- 🔄 **AI-Powered Syncing:** README Pro can analyze pull requests to identify changes in your code (like new dependencies or environment variables) and automatically suggest updates for your documentation.
+- 🔄 **AI-Powered Syncing:** *(Conceptual)* Keep your documentation synchronized with your codebase. This feature is designed to analyze pull requests for changes (new dependencies, environment variables, etc.) and automatically suggest README updates. **Note:** This requires a backend service and GitHub App integration, which is not part of the client-side application.
 - 🏢 **Team Templates & Policies:** Define and share custom README templates across your organization. Enforce required sections like "Security Policy," "Contributor Guidelines," or "Deployment Instructions" to maintain standards.
 - 📊 **README Analytics:** *(Coming Soon)* Gain insights into how users interact with your documentation. Track which sections are most viewed and get AI-driven suggestions to improve clarity and engagement.
+
+## Getting Started with the CLI
+
+### 1. Installation
+
+To use the CLI tool, you need to have Node.js installed. Then, install the necessary dependencies:
+
+```bash
+npm install
+```
+
+### 2. Usage
+
+Run the CLI from your terminal, providing a repository URL and your AI provider's API key.
+
+```bash
+# Usage: readme-pro --repo <github_url> --key <api_key> [options]
+
+# Example with OpenAI
+node cli.js --repo https://github.com/gilbarbara/react-joyride --key sk-YourOpenAIKey
+
+# Example with Gemini and a specific output file
+node cli.js --repo https://github.com/google/go-cloud --key YourGeminiApiKey --provider gemini --out GO_CLOUD_README.md
+```
 
 ## Get Your Pro License
 

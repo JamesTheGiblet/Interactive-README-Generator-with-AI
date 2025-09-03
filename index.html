@@ -114,10 +114,24 @@
                                 </select>
                                 <button type="button" id="loadTemplateBtn">Load</button>
                                 <button type="button" id="deleteTemplateBtn">Delete</button>
-                                <button type="button" id="importGithubBtn" class="import-btn">Import from GitHub</button>
                             </div>
 
                         </div>
+
+                        <fieldset class="github-analysis-box">
+                            <legend>🚀 Smart Fill from GitHub</legend>
+                            <p class="help-text">Enter a public repository URL to automatically fill in project details. For private repos or higher rate limits, provide a Personal Access Token.</p>
+                            <div class="form-group">
+                                <label for="githubRepoUrl">GitHub Repository URL</label>
+                                <input type="text" id="githubRepoUrl" placeholder="https://github.com/user/repo">
+                            </div>
+                            <div class="form-group">
+                                <label for="githubPat">GitHub Personal Access Token (Optional)</label>
+                                <input type="password" id="githubPat" placeholder="Enter your GitHub PAT">
+                                <div class="help-text">Your token is used only for this session and not stored. <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" rel="noopener">Create a token with 'repo' scope</a>.</div>
+                            </div>
+                            <button type="button" id="analyzeRepoBtn" class="btn-secondary">Analyze Repository</button>
+                        </fieldset>
 
                         <div class="form-group">
 
@@ -514,7 +528,7 @@
                             <button type="button" id="saveTemplateBtn" class="btn-secondary">💾 Save as Template</button>
                             <button type="button" class="btn-secondary" id="abTestBtn">🔄 Compare</button>
 
-                            <button type="button" class="btn-secondary" id="githubUpdateBtn" disabled title="Coming soon: Direct GitHub integration requires a backend service.">Update on GitHub</button>
+                            <button type="button" class="btn-secondary" id="syncWithGithubBtn">🔄 Sync with GitHub</button>
                             <button type="button" id="startOverBtn" class="btn-secondary">Create Another</button>
                         </div>
 

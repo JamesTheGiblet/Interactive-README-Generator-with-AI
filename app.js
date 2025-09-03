@@ -67,6 +67,7 @@ const ReadmeGenerator = {
 
         document.getElementById('apiProvider').addEventListener('change', () => this.ui.updateApiHelpText());
         document.getElementById('projectType').addEventListener('change', () => this.ui.updateFieldVisibility());
+        document.getElementById('analyzeRepoBtn').addEventListener('click', () => this.events.handleRepoAnalysis());
 
         // Handle the main progression button (Next / Generate)
         document.getElementById('nextBtn').addEventListener('click', () => {
@@ -478,6 +479,9 @@ const ReadmeGenerator = {
 
 Project Name: ${data.projectName}
 Description: ${data.description}
+${data.fileStructure ? `
+File Structure Summary:
+${data.fileStructure}` : ''}
 Project Type: ${data.projectType}
 Primary Language: ${data.mainLanguage}
 Frameworks/Technologies: ${data.frameworks}
@@ -502,7 +506,7 @@ IMPORTANT INSTRUCTIONS FOR HANDLING MISSING/UNCERTAIN INFORMATION:
 ${hasUnsureFields ? `
 SMART FILLING REQUIRED: The user has indicated uncertainty about some fields or left them blank. Please intelligently fill in missing information based on the project description and available context:
 
-1. If project type is "not-sure" - analyze the description and other details to determine the most likely project type
+1. If project type is "not-sure" - analyze the description and file structure to determine the most likely project type (e.g., presence of 'src/main.js' and 'public/index.html' suggests a web app).
 2. If language is "not-sure" - infer from frameworks, dependencies, or project description
 3. If frameworks/dependencies contain "not sure" - suggest appropriate ones based on the project type and language
 4. If features contain "not sure" - generate logical features based on the project description and type
@@ -564,52 +568,94 @@ Generate only the README content in valid Markdown format, nothing else.`;
             return errorMessages[provider]?.[status] || error.message || `An unexpected error occurred (Status: ${status}).`;
         },
 
-        importFromGitHub: async function() {
-            const self = ReadmeGenerator;
-            const repoUrl = prompt("Enter a public GitHub repository URL to import a template from (e.g., https://github.com/user/repo):");
-            if (!repoUrl) return;
-
-            let userRepo;
-            try {
-                const url = new URL(repoUrl);
-                if (url.hostname === 'github.com') {
-                    userRepo = url.pathname.substring(1).split('/').slice(0, 2).join('/');
+        fetchAndParseRepo: async function(owner, repo, token) {
+            const headers = { 'Accept': 'application/vnd.github.v3+json' };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+        
+            const githubApiGet = async (path) => {
+                const response = await fetch(`https://api.github.com${path}`, { headers });
+                if (response.status === 404) return null; // Gracefully handle not found
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `GitHub API request failed: ${response.status}`);
                 }
-            } catch (e) {
-                if (repoUrl.includes('/') && !repoUrl.startsWith('http')) {
-                    userRepo = repoUrl.split('/').slice(0, 2).join('/');
+                return response.json();
+            };
+        
+            const getFileContent = async (filePath) => {
+                const data = await githubApiGet(`/repos/${owner}/${repo}/contents/${filePath}`);
+                if (!data || !data.content) return null;
+                return atob(data.content);
+            };
+        
+            // 1. Fetch basic repo info
+            const repoInfo = await githubApiGet(`/repos/${owner}/${repo}`);
+            if (!repoInfo) throw new Error("Repository not found or access denied.");
+        
+            const extractedData = {
+                projectName: repoInfo.name,
+                description: repoInfo.description || '',
+                mainLanguage: repoInfo.language ? repoInfo.language.toLowerCase() : 'not-sure',
+                author: repoInfo.owner?.login || '',
+            };
+
+            // 2. Fetch and analyze file structure for deeper insights
+            const tree = await githubApiGet(`/repos/${owner}/${repo}/git/trees/${repoInfo.default_branch}?recursive=1`);
+            if (tree && tree.tree) {
+                const relevantExtensions = ['.js', '.ts', '.py', '.java', '.go', '.rb', '.php', '.cs', '.html', '.css', '.scss', '.md', '.json', '.yml', '.yaml', '.toml', '.xml', 'dockerfile', 'gemfile', 'pom.xml'];
+                const excludedDirs = ['node_modules', '.git', 'dist', 'build', 'coverage', 'vendor', 'target', 'public/'];
+                const filePaths = tree.tree
+                    .filter(node => node.type === 'blob')
+                    .map(node => node.path)
+                    .filter(path => !excludedDirs.some(dir => path.startsWith(dir)))
+                    .filter(path => {
+                        const lowerPath = path.toLowerCase();
+                        return relevantExtensions.some(ext => lowerPath.endsWith(ext) || lowerPath.includes(ext.replace('.', '')));
+                    });
+                if (filePaths.length > 0) {
+                    extractedData.fileStructure = filePaths.slice(0, 100).join('\n'); // Limit to 100 files for prompt efficiency
                 }
             }
-
-            if (!userRepo || userRepo.split('/').length < 2) {
-                self.ui.showError("Invalid GitHub repository URL format. Use 'user/repo' or a full URL.");
-                return;
-            }
-
-            const templateFileName = '.readme-generator.json';
-            const branches = ['main', 'master'];
-            let templateData = null;
-
-            self.ui.showInfoMessage('Importing from GitHub...');
-
-            for (const branch of branches) {
-                const rawUrl = `https://raw.githubusercontent.com/${userRepo}/${branch}/${templateFileName}`;
+        
+            // 2. Fetch and parse dependency files
+            const packageJsonContent = await getFileContent('package.json');
+            if (packageJsonContent) {
                 try {
-                    const response = await fetch(rawUrl);
-                    if (response.ok) {
-                        templateData = await response.json();
-                        break;
-                    }
-                } catch (e) { /* Ignore fetch errors */ }
+                    const packageJson = JSON.parse(packageJsonContent);
+                    const deps = {
+                        ...packageJson.dependencies,
+                        ...packageJson.devDependencies
+                    };
+                    const depKeys = Object.keys(deps);
+                    
+                    // Simple logic to find frameworks
+                    const frameworks = depKeys.filter(k => ['react', 'vue', 'angular', 'svelte', 'express', 'next', 'nuxt'].includes(k));
+                    
+                    if(frameworks.length > 0) extractedData.frameworks = frameworks.join(', ');
+                    if(depKeys.length > 0) extractedData.dependencies = depKeys.slice(0, 5).join(', '); // List first 5
+                    extractedData.projectType = 'web-app'; // Good assumption for package.json
+                    if (packageJson.license) extractedData.license = packageJson.license;
+                } catch (e) {
+                    console.warn("Could not parse package.json");
+                }
             }
-
-            if (templateData) {
-                self.utils.populateForm(templateData);
-                self.ui.showInfoMessage(`Template successfully imported from '${userRepo}'.`);
-                AccessibilityModule.announce(`Template successfully imported from repository ${userRepo}.`);
-            } else {
-                self.ui.showError(`Could not find a '${templateFileName}' file in the '${userRepo}' repository on 'main' or 'master' branch.`);
+        
+            const requirementsTxtContent = await getFileContent('requirements.txt');
+            if (requirementsTxtContent) {
+                const deps = requirementsTxtContent.split('\n').filter(line => line && !line.startsWith('#')).map(line => line.split(/==|>=/)[0].trim());
+                const currentDeps = extractedData.dependencies ? extractedData.dependencies + ', ' : '';
+                extractedData.dependencies = currentDeps + deps.slice(0, 5).join(', ');
+                extractedData.projectType = 'web-app'; // Or could be a library
+                if (!extractedData.mainLanguage || extractedData.mainLanguage === 'not-sure') {
+                    extractedData.mainLanguage = 'python';
+                }
             }
+            
+            // Can add more parsers here for pom.xml, Gemfile, etc.
+        
+            return extractedData;
         },
     },
 
@@ -809,6 +855,53 @@ Generate only the README content in valid Markdown format, nothing else.`;
             const self = ReadmeGenerator;
             if (self.state.currentStep > 1) {
                 self.ui.showStep(self.state.currentStep - 1);
+            }
+        },
+
+        handleRepoAnalysis: async function() {
+            const self = ReadmeGenerator;
+            const repoUrl = document.getElementById('githubRepoUrl').value.trim();
+            const token = document.getElementById('githubPat').value.trim();
+        
+            if (!repoUrl) {
+                self.ui.showError("Please enter a GitHub repository URL.");
+                return;
+            }
+        
+            let owner, repo;
+            try {
+                const url = new URL(repoUrl);
+                if (url.hostname !== 'github.com') {
+                    throw new Error();
+                }
+                [owner, repo] = url.pathname.substring(1).split('/').slice(0, 2);
+            } catch (e) {
+                self.ui.showError("Invalid GitHub repository URL format. Please use a full URL like https://github.com/user/repo.");
+                return;
+            }
+        
+            if (!owner || !repo) {
+                self.ui.showError("Invalid GitHub repository URL format. Could not extract owner and repository.");
+                return;
+            }
+        
+            const analyzeBtn = document.getElementById('analyzeRepoBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = 'Analyzing...';
+            self.ui.showInfoMessage(`Analyzing ${owner}/${repo}...`);
+        
+            try {
+                const repoData = await self.api.fetchAndParseRepo(owner, repo, token);
+                self.utils.populateForm(repoData);
+                self.ui.showInfoMessage(`Analysis complete! Form has been pre-filled.`);
+                AccessibilityModule.announce(`Repository analysis complete. Form has been pre-filled.`);
+                setTimeout(() => self.ui.hideError(), 5000);
+            } catch (error) {
+                console.error("Repo analysis failed:", error);
+                self.ui.showError(error.message || "Failed to analyze repository. Check the URL, token, and browser console.");
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = 'Analyze Repository';
             }
         },
 
