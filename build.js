@@ -22,7 +22,7 @@ const scriptOrder = [
 
 // Generate the HTML script tags in the correct order.
 const scriptTags = scriptOrder
-    .map(scriptFile => `    <script src="modules/${scriptFile}"></script>`)
+    .map(scriptFile => `    <script src="src/modules/${scriptFile}"></script>`)
     .join('\n');
 
 // Read the template file.

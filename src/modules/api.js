@@ -240,3 +240,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
         return extractedData;
     },
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { api };
+}
