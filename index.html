@@ -61,9 +61,7 @@
         <div class="main-layout">
 
             <div class="form-column">
-
-                <div class="content">
-
+                <form id="readmeForm" class="content">
                     <div class="progress-bar">
 
                         <div class="progress-fill" id="progressFill"></div>
@@ -99,13 +97,9 @@
                                     <option value="">-- No templates saved --</option>
 
                                 </select>
-
-                                <button onclick="ReadmeGenerator.storage.loadSelectedTemplate()">Load</button>
-
-                                <button onclick="ReadmeGenerator.storage.deleteSelectedTemplate()">Delete</button>
-
-                                <button onclick="ReadmeGenerator.api.importFromGitHub()" class="import-btn">Import from GitHub</button>
-
+                                <button type="button" id="loadTemplateBtn">Load</button>
+                                <button type="button" id="deleteTemplateBtn">Delete</button>
+                                <button type="button" id="importGithubBtn" class="import-btn">Import from GitHub</button>
                             </div>
 
                         </div>
@@ -492,13 +486,13 @@
 
                                 <a href="#" class="download-btn" id="downloadBtn">📥 Download README.md</a>
 
-                                <button id="pdfBtn" class="pdf-btn">📄 Export PDF</button>
+                                <button type="button" id="pdfBtn" class="pdf-btn">📄 Export PDF</button>
 
-                                <button id="htmlBtn" class="html-btn">🌐 Export HTML</button>
+                                <button type="button" id="htmlBtn" class="html-btn">🌐 Export HTML</button>
 
-                                <button id="shareBtn" class="share-btn">🔗 Share Link</button>
+                                <button type="button" id="shareBtn" class="share-btn">🔗 Share Link</button>
 
-                                <button id="copyBtn" class="copy-btn">📋 Copy Markdown</button>
+                                <button type="button" id="copyBtn" class="copy-btn">📋 Copy Markdown</button>
 
                             </div>
 
@@ -537,17 +531,12 @@
                         <div class="preview" id="preview"></div>
 
                         <div class="button-group">
+                            <button type="button" id="editDetailsBtn" class="btn-secondary">✏️ Edit Details</button>
+                            <button type="button" id="saveTemplateBtn" class="btn-secondary">💾 Save as Template</button>
+                            <button type="button" class="btn-secondary" id="abTestBtn">🔄 Compare</button>
 
-                            <button class="btn-secondary" onclick="ReadmeGenerator.ui.editDetails()">✏️ Edit Details</button>
-
-                            <button class="btn-secondary" onclick="ReadmeGenerator.storage.saveTemplate()">💾 Save as Template</button>
-
-                            <button class="btn-secondary" id="abTestBtn">🔄 Compare</button>
-
-                            <button class="btn-secondary" id="githubUpdateBtn" disabled title="Coming soon: Direct GitHub integration requires a backend service.">Update on GitHub</button>
-
-                            <button class="btn-secondary" onclick="ReadmeGenerator.events.startOver()">Create Another</button>
-
+                            <button type="button" class="btn-secondary" id="githubUpdateBtn" disabled title="Coming soon: Direct GitHub integration requires a backend service.">Update on GitHub</button>
+                            <button type="button" id="startOverBtn" class="btn-secondary">Create Another</button>
                         </div>
 
                     </div>
@@ -563,15 +552,10 @@
                     <!-- Navigation Buttons -->
 
                     <div class="button-group" id="navigation">
-
-                        <button class="btn-secondary" id="prevBtn" onclick="ReadmeGenerator.events.previousStep()">← Previous</button>
-
-                        <button class="btn-primary" id="nextBtn">Next →</button>
-
+                        <button type="button" class="btn-secondary" id="prevBtn">← Previous</button>
+                        <button type="button" class="btn-primary" id="nextBtn">Next →</button>
                     </div>
-
-                </div>
-
+                </form>
             </div>
 
             <div class="preview-column" id="preview-column">
@@ -613,9 +597,7 @@
             </div>
 
             <div class="button-group center-content">
-
-                <button class="btn-secondary" onclick="ReadmeGenerator.ui.exitABTest()">← Back to Result</button>
-
+                <button type="button" id="exitABTestBtn" class="btn-secondary">← Back to Result</button>
             </div>
 
         </div>
@@ -625,9 +607,7 @@
     <div id="insightsModal" class="modal-overlay">
 
         <div class="modal-content">
-
-            <span class="modal-close" id="modalCloseBtn">&times;</span>
-
+            <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
             <h2>Analytics & Insights</h2>
 
             <div class="modal-tabs">
@@ -703,9 +683,7 @@
     <div id="examplesModal" class="modal-overlay">
 
         <div class="modal-content">
-
-            <span class="modal-close" id="examplesModalCloseBtn">&times;</span>
-
+            <button type="button" class="modal-close" id="examplesModalCloseBtn" aria-label="Close">&times;</button>
             <h2>README Examples</h2>
 
             <div class="examples-modal-layout">
