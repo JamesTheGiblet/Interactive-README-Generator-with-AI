@@ -9,7 +9,14 @@ const ModalManager = {
         const insightsModal = document.getElementById('insightsModal');
         if (!insightsModal) return;
 
-        document.getElementById('insightsBtn').addEventListener('click', () => this.show(insightsModal));
+        document.getElementById('insightsBtn').addEventListener('click', () => {
+            this.show(insightsModal);
+            // Populate content if it hasn't been already
+            if (!insightsModal.dataset.rulesInitialized) {
+                this.populateBestPracticesTab();
+                insightsModal.dataset.rulesInitialized = 'true';
+            }
+        });
         document.getElementById('modalCloseBtn').addEventListener('click', () => this.hide(insightsModal));
         
         insightsModal.addEventListener('click', (event) => {
@@ -115,6 +122,15 @@ const ModalManager = {
             console.error('Error loading example:', error);
             examplesTabContent.innerHTML = `<div class="error" style="display:block;">Failed to load example file: ${filePath}.</div>`;
         }
+    },
+
+    populateBestPracticesTab: async function() {
+        const container = document.getElementById('tab-practices');
+        if (!container || !window.ReadmeRules || !window.MarkdownRenderer) return;
+
+        container.innerHTML = '<div class="spinner" style="margin: 20px auto;"></div>';
+        // Use the existing MarkdownRenderer to parse and render the content
+        await MarkdownRenderer.render(window.ReadmeRules.content, container);
     },
 
     show: function(modalElement) {
