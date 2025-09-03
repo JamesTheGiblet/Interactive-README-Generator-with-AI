@@ -178,7 +178,7 @@ const utils = {
         
         // Trigger UI updates that depend on form values
         ReadmeGenerator.ui.updateFieldVisibility();
-        document.getElementById('customToneGroup').style.display = toneSelect.value === 'custom' ? 'block' : 'none';
+        document.getElementById('customToneGroup').classList.toggle('hidden', toneSelect.value !== 'custom');
     },
 
     /**

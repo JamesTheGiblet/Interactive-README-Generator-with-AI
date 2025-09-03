@@ -13,15 +13,7 @@ const AccessibilityModule = {
     liveRegion.id = 'a11y-live-region';
     liveRegion.setAttribute('aria-live', 'polite');
     liveRegion.setAttribute('aria-atomic', 'true');
-    // Visually hide the element
-    liveRegion.style.position = 'absolute';
-    liveRegion.style.width = '1px';
-    liveRegion.style.height = '1px';
-    liveRegion.style.padding = '0';
-    liveRegion.style.overflow = 'hidden';
-    liveRegion.style.clip = 'rect(0, 0, 0, 0)';
-    liveRegion.style.whiteSpace = 'nowrap';
-    liveRegion.style.border = '0';
+    liveRegion.classList.add('visually-hidden');
     document.body.appendChild(liveRegion);
   },
 
@@ -79,10 +71,9 @@ const AccessibilityModule = {
 
       // Escape key to close modals
       if (e.key === 'Escape') {
-        const openModal = document.querySelector('.modal-overlay[style*="display: flex"]');
+        const openModal = document.querySelector('.modal-overlay.is-visible');
         if (openModal) {
-          openModal.style.display = 'none';
-          this.announce('Modal closed.');
+          ModalManager.hide(openModal);
         }
       }
 

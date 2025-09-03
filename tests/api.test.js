@@ -84,7 +84,7 @@ describe('api.js', () => {
 
             const prompt = api.createPrompt(formData);
             expect(prompt).toContain('Project Name: My Test App');
-            expect(prompt).toContain('Tone of Voice: Write the entire document in a professional tone.');
+            expect(prompt).toContain('1. **Tone of Voice**: Write the entire document in a **professional** tone.');
             expect(prompt).not.toContain('SMART FILLING REQUIRED');
         });
 

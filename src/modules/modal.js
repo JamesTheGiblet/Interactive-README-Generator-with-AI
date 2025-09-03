@@ -134,12 +134,12 @@ const ModalManager = {
     },
 
     show: function(modalElement) {
-        if (modalElement) modalElement.style.display = 'flex';
+        if (modalElement) modalElement.classList.add('is-visible');
         if (window.AccessibilityModule) AccessibilityModule.announce(`${modalElement.querySelector('h2').textContent} modal opened.`);
     },
 
     hide: function(modalElement) {
-        if (modalElement) modalElement.style.display = 'none';
+        if (modalElement) modalElement.classList.remove('is-visible');
         if (window.AccessibilityModule) AccessibilityModule.announce('Modal closed.');
     }
 };

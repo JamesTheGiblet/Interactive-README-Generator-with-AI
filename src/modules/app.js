@@ -59,7 +59,7 @@ const ReadmeGenerator = {
 
         // Event Listeners
         document.getElementById('tone').addEventListener('change', (e) => {
-            document.getElementById('customToneGroup').style.display = e.target.value === 'custom' ? 'block' : 'none';
+            document.getElementById('customToneGroup').classList.toggle('hidden', e.target.value !== 'custom');
         });
 
         const debouncedUpdate = utils.debounce(() => {
@@ -180,8 +180,7 @@ const ReadmeGenerator = {
             const downloadBtn = document.getElementById('downloadBtn');
 
             preview.innerHTML = `<div class="loading" style="display: block; padding: 40px;"><div class="spinner"></div><p>Applying new tone...</p></div>`;
-            downloadBtn.style.pointerEvents = 'none';
-            downloadBtn.style.opacity = '0.5';
+            downloadBtn.classList.add('is-loading');
             resultToneSelect.disabled = true;
 
             try {
@@ -195,8 +194,7 @@ const ReadmeGenerator = {
                 console.error('Error regenerating README:', error);
                 preview.innerHTML = marked.parse(ReadmeGenerator.state.generatedReadme);
                 ReadmeGenerator.ui.showError(ReadmeGenerator.api.getApiErrorMessage(error, ReadmeGenerator.state.lastFormData.apiProvider));
-                downloadBtn.style.pointerEvents = 'auto';
-                downloadBtn.style.opacity = '1';
+                downloadBtn.classList.remove('is-loading');
                 resultToneSelect.disabled = false;
             }
         },
@@ -222,8 +220,7 @@ const ReadmeGenerator = {
                 const alternateReadme = await ReadmeGenerator.api.callAIAPI(alternateProvider, ReadmeGenerator.state.lastFormData.apiKey, prompt);
 
                 // Hide main result and form, show A/B test view
-                document.querySelector('.main-layout').style.display = 'none';
-                document.getElementById('abTestResult').style.display = 'block';
+                ReadmeGenerator.ui.setView('ab-test');
 
                 // Populate A/B test view
                 const abPreview1 = document.getElementById('abPreview1');
@@ -316,10 +313,7 @@ const ReadmeGenerator = {
             language: data.mainLanguage,
         });
 
-        document.getElementById('navigation').style.display = 'none';
-        document.querySelector('.step.active').style.display = 'none';
-        document.getElementById('preview-column').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
+        self.ui.setView('loading');
         
         try {
             const prompt = self.api.createPrompt(data);
@@ -332,9 +326,7 @@ const ReadmeGenerator = {
             console.error('Error generating README:', error);
             self.ui.showError(self.api.getApiErrorMessage(error, data.apiProvider));
             
-            document.getElementById('loading').style.display = 'none';
-            document.querySelector(`[data-step="${self.state.currentStep}"]`).style.display = 'block';
-            document.getElementById('navigation').style.display = 'flex';
+            self.ui.setView('form');
         }
     },
 };

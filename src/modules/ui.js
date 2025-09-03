@@ -1,4 +1,8 @@
 const ui = {
+    setView: function(viewName) { // 'form', 'loading', 'result', 'ab-test'
+        document.body.dataset.view = viewName;
+    },
+
     showStep: function(step) {
         ReadmeGenerator.state.currentStep = step;
 
@@ -21,10 +25,10 @@ const ui = {
 
         const previewColumn = document.getElementById('preview-column');
         if (step > 1 && step <= ReadmeGenerator.config.totalSteps) {
-            previewColumn.style.display = 'block';
+            previewColumn.classList.add('is-visible');
             this.updateLivePreview();
         } else {
-            previewColumn.style.display = 'none';
+            previewColumn.classList.remove('is-visible');
         }
     },
 
@@ -37,11 +41,9 @@ const ui = {
 
     showError: function(message) {
         const errorDiv = document.getElementById('error');
-        errorDiv.style.background = 'var(--error-bg)';
-        errorDiv.style.border = '1px solid var(--error-border)';
-        errorDiv.style.color = 'var(--error-text)';
+        errorDiv.classList.remove('is-info');
         errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
+        errorDiv.classList.add('is-visible');
         errorDiv.scrollIntoView({ behavior: 'smooth' });
         AccessibilityModule.announce(`Error: ${message}`);
     },
@@ -49,16 +51,13 @@ const ui = {
     showInfoMessage: function(message) {
         const infoDiv = document.getElementById('error');
         infoDiv.textContent = message;
-        infoDiv.style.background = 'var(--info-bg)';
-        infoDiv.style.color = 'var(--info-text)';
-        infoDiv.style.border = '1px solid var(--info-border)';
-        infoDiv.style.display = 'block';
+        infoDiv.classList.add('is-info', 'is-visible');
         infoDiv.scrollIntoView({ behavior: 'smooth' });
         AccessibilityModule.announce(`Info: ${message}`);
     },
 
     hideError: function() {
-        document.getElementById('error').style.display = 'none';
+        document.getElementById('error').classList.remove('is-visible');
     },
 
     updateLivePreview: function() {
@@ -111,8 +110,7 @@ const ui = {
     },
 
     displayResult: async function(readme) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('result').style.display = 'block';
+        this.setView('result');
         localStorage.removeItem('readmeGenerator_draft');
         
         const preview = document.getElementById('preview');
@@ -152,7 +150,6 @@ const ui = {
         const otherProvider = ReadmeGenerator.state.lastFormData.apiProvider === 'gemini' ? 'OpenAI' : 'Gemini';
         abTestBtn.textContent = `🔄 Compare with ${otherProvider}`;
         abTestBtn.onclick = () => ReadmeGenerator.events.runABTest();
-        abTestBtn.style.display = 'block';
 
         const resultToneSelect = document.getElementById('resultTone');
         const resultCustomToneGroup = document.getElementById('resultCustomToneGroup');
@@ -163,20 +160,20 @@ const ui = {
             const isStandardTone = [...resultToneSelect.options].some(opt => opt.value === ReadmeGenerator.state.lastFormData.tone);
             if (isStandardTone) {
                 resultToneSelect.value = ReadmeGenerator.state.lastFormData.tone;
-                resultCustomToneGroup.style.display = 'none';
+                resultCustomToneGroup.classList.add('hidden');
             } else {
                 resultToneSelect.value = 'custom';
                 resultCustomToneInput.value = ReadmeGenerator.state.lastFormData.tone;
-                resultCustomToneGroup.style.display = 'block';
+                resultCustomToneGroup.classList.remove('hidden');
             }
         }
 
         const handleResultToneChange = () => {
-            if (resultToneSelect.value === 'custom') {
-                resultCustomToneGroup.style.display = 'block';
+            const isCustom = resultToneSelect.value === 'custom';
+            resultCustomToneGroup.classList.toggle('hidden', !isCustom);
+            if (isCustom) {
                 resultCustomToneInput.focus();
             } else {
-                resultCustomToneGroup.style.display = 'none';
                 ReadmeGenerator.events.changeToneAndRegenerate();
             }
         };
@@ -188,8 +185,7 @@ const ui = {
         resultToneSelect.onchange = handleResultToneChange;
         resultCustomToneInput.onkeypress = handleCustomToneEnter;
         resultToneSelect.disabled = false;
-        downloadBtn.style.pointerEvents = 'auto';
-        downloadBtn.style.opacity = '1';
+        downloadBtn.classList.remove('is-loading');
     },
 
     setPreviewTheme: function(theme) {
@@ -210,17 +206,13 @@ const ui = {
     },
 
     editDetails: function() {
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('preview-column').style.display = 'block';
-        document.getElementById('navigation').style.display = 'flex';
+        this.setView('form');
         this.showStep(ReadmeGenerator.config.totalSteps);
         this.hideError();
     },
 
     exitABTest: function() {
-        document.querySelector('.main-layout').style.display = 'flex';
-        document.getElementById('abTestResult').style.display = 'none';
-        document.getElementById('result').style.display = 'block';
+        this.setView('result');
     },
 
     setupDownload: function(readme) {

@@ -61,7 +61,7 @@ describe('utils.js', () => {
         });
 
         it('should return valid for a correct Gemini key', () => {
-            expect(utils.validateApiKeyFormat('gemini', 'AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx').valid).toBe(true);
+            expect(utils.validateApiKeyFormat('gemini', 'AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx').valid).toBe(true);
         });
 
         it('should return invalid for a Gemini key of wrong length', () => {
