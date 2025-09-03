@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>README Generator - Powered by Gemini AI</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+
+            <div class="header-buttons">
+
+                <button class="btn-secondary" id="insightsBtn">📊 Insights & Tips</button>
+
+                <button class="btn-secondary" id="examplesBtn">📚 Examples</button>
+
+            </div>
+
+            <div class="header-content">
+
+                <h1>🚀 README Generator</h1>
+
+                <p>Powered by Gemini AI - Create professional documentation effortlessly</p>
+
+            </div>
+
+            <div class="theme-switch-wrapper">
+
+                <label class="theme-switch" for="theme-checkbox">
+
+                    <input type="checkbox" id="theme-checkbox" title="Toggle dark/light theme" />
+
+                    <div class="slider round"></div>
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="main-layout">
+
+            <div class="form-column">
+
+                <div class="content">
+
+                    <div class="progress-bar">
+
+                        <div class="progress-fill" id="progressFill"></div>
+
+                    </div>
+
+                    <div class="step-indicator" id="stepIndicator">Step 1 of 6</div>
+
+
+
+                    <!-- Step 1: API Key -->
+
+                    <div class="step active" data-step="1">
+
+                        <h2>🔐 API Configuration</h2>
+
+                        <div class="ai-help">
+
+                            <h4>🤖 AI-Powered Smart Filling</h4>
+
+                            <p>Don't worry if you're unsure about any details! Our AI can intelligently fill in missing information based on your project description and available context.</p>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="savedTemplates">Load or Import Template</label>
+
+                            <div class="template-controls">
+
+                                <select id="savedTemplates">
+
+                                    <option value="">-- No templates saved --</option>
+
+                                </select>
+
+                                <button onclick="ReadmeGenerator.storage.loadSelectedTemplate()">Load</button>
+
+                                <button onclick="ReadmeGenerator.storage.deleteSelectedTemplate()">Delete</button>
+
+                                <button onclick="ReadmeGenerator.api.importFromGitHub()" class="import-btn">Import from GitHub</button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="apiProvider">AI Provider</label>
+
+                            <select id="apiProvider">
+
+                                <option value="gemini">Google Gemini</option>
+
+                                <option value="openai">OpenAI GPT</option>
+
+                            </select>
+
+                            <div class="help-text" id="apiProviderInfo"></div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="apiKey">API Key *</label>
+
+                            <input type="password" id="apiKey" class="api-key-input" placeholder="Enter your API key" required>
+
+                            <div class="help-text" id="apiKeyHelp"></div>
+
+                        </div>
+
+                        <div class="checkbox-item remember-api-key">
+
+                            <input type="checkbox" id="rememberApiKey">
+
+                            <label for="rememberApiKey" class="remember-api-key-label">Remember API key in this browser</label>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Step 2: Basic Info -->
+
+                    <div class="step" data-step="2">
+
+                        <h2>📝 Project Basics</h2>
+
+                        <div class="form-group">
+
+                            <label for="projectName">Project Name *</label>
+
+                            <input type="text" id="projectName" placeholder="My Awesome Project" required>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="description">Short Description *</label>
+
+                            <textarea id="description" placeholder="A brief description of what your project does..." required></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="projectType">Project Type</label>
+
+                            <select id="projectType">
+
+                                <option value="not-sure">Not sure - Let AI decide</option>
+
+                                <option value="web-app">Web Application</option>
+
+                                <option value="mobile-app">Mobile Application</option>
+
+                                <option value="library">Library/Package</option>
+
+                                <option value="api">API/Backend Service</option>
+
+                                <option value="cli-tool">CLI Tool</option>
+
+                                <option value="desktop-app">Desktop Application</option>
+
+                                <option value="game">Game</option>
+
+                                <option value="other">Other</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Step 3: Technical Details -->
+
+                    <div class="step" data-step="3">
+
+                        <h2>⚙️ Technical Stack</h2>
+
+                        <div class="form-group">
+
+                            <label for="mainLanguage">Primary Programming Language</label>
+
+                            <select id="mainLanguage">
+
+                                <option value="not-sure">Not sure - Let AI determine</option>
+
+                                <option value="">Skip this field</option>
+
+                                <option value="javascript">JavaScript</option>
+
+                                <option value="typescript">TypeScript</option>
+
+                                <option value="python">Python</option>
+
+                                <option value="java">Java</option>
+
+                                <option value="csharp">C#</option>
+
+                                <option value="cpp">C++</option>
+
+                                <option value="go">Go</option>
+
+                                <option value="rust">Rust</option>
+
+                                <option value="php">PHP</option>
+
+                                <option value="ruby">Ruby</option>
+
+                                <option value="swift">Swift</option>
+
+                                <option value="kotlin">Kotlin</option>
+
+                                <option value="other">Other</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="frameworks">Frameworks & Technologies</label>
+
+                            <textarea id="frameworks" placeholder="React, Node.js, Express, MongoDB, etc... (or type 'not sure' if uncertain)"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="dependencies">Key Dependencies</label>
+
+                            <textarea id="dependencies" placeholder="List important libraries, packages, or tools your project uses... (or type 'not sure' if uncertain)"></textarea>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Step 4: Features -->
+
+                    <div class="step" data-step="4">
+
+                        <h2>✨ Features & Functionality</h2>
+
+                        <div class="form-group">
+
+                            <label for="features">Main Features</label>
+
+                            <textarea id="features" placeholder="Describe the key features and capabilities of your project... (or type 'not sure' if you want AI to suggest based on your description)"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="demo">Demo/Screenshots</label>
+
+                            <textarea id="demo" placeholder="URLs to live demo, screenshots, or video demonstrations... (leave empty if none available)"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Include sections:</label>
+
+                            <div class="checkbox-group">
+
+                                <div class="checkbox-item">
+
+                                    <input type="checkbox" id="includeInstall" checked>
+
+                                    <label for="includeInstall">Installation Guide</label>
+
+                                </div>
+
+                                <div class="checkbox-item">
+
+                                    <input type="checkbox" id="includeUsage" checked>
+
+                                    <label for="includeUsage">Usage Examples</label>
+
+                                </div>
+
+                                <div class="checkbox-item" data-field="api">
+
+                                    <input type="checkbox" id="includeAPI">
+
+                                    <label for="includeAPI">API Documentation</label>
+
+                                </div>
+
+                                <div class="checkbox-item">
+
+                                    <input type="checkbox" id="includeContrib" checked>
+
+                                    <label for="includeContrib">Contributing Guidelines</label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Step 5: Installation & Usage -->
+
+                    <div class="step" data-step="5">
+
+                        <h2>🛠️ Setup & Usage</h2>
+
+                        <div class="form-group">
+
+                            <label for="installation">Installation Instructions</label>
+
+                            <textarea id="installation" placeholder="Step-by-step installation process (npm install, pip install, etc.)... Type 'not sure' if you want AI to generate standard instructions based on your tech stack"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="usage">Usage Examples</label>
+
+                            <textarea id="usage" placeholder="Code examples, command line usage, or how to get started... Type 'not sure' if you want AI to create examples based on your project type"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="requirements">Prerequisites/Requirements</label>
+
+                            <textarea id="requirements" placeholder="System requirements, software versions, environment setup... Type 'not sure' if you want AI to determine based on your tech stack"></textarea>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Step 6: Final Details -->
+
+                    <div class="step" data-step="6">
+
+                        <h2>📄 Final Details</h2>
+
+                        <div class="not-sure-hint">
+
+                            💡 <strong>Tip:</strong> If you're unsure about the license, select "Not sure" and our AI will recommend the most appropriate one for your project type.
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="tone">Tone of Voice</label>
+
+                            <select id="tone">
+
+                                <option value="professional">Professional & Polished</option>
+
+                                <option value="friendly">Friendly & Casual</option>
+
+                                <option value="technical">Technical & Formal</option>
+
+                                <option value="playful">Playful & Creative</option>
+
+                                <option value="ai-decide">Let AI Decide</option>
+
+                                <option value="custom">Custom...</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group" id="customToneGroup">
+
+                            <label for="customTone">Define Custom Tone</label>
+
+                            <input type="text" id="customTone" placeholder="e.g., 'Witty and sarcastic', 'Academic and formal'">
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="license">License</label>
+
+                            <select id="license">
+
+                                <option value="not-sure">Not sure - Recommend appropriate license</option>
+
+                                <option value="MIT">MIT License</option>
+
+                                <option value="Apache-2.0">Apache License 2.0</option>
+
+                                <option value="GPL-3.0">GNU GPL v3.0</option>
+
+                                <option value="BSD-3-Clause">BSD 3-Clause</option>
+
+                                <option value="ISC">ISC License</option>
+
+                                <option value="Unlicense">Unlicense</option>
+
+                                <option value="Custom">Custom/Other</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="author">Author/Maintainer</label>
+
+                            <input type="text" id="author" placeholder="Your name or organization (optional)">
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="contact">Contact/Support</label>
+
+                            <textarea id="contact" placeholder="Email, GitHub profile, website, or support channels... (optional)"></textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="acknowledgments">Acknowledgments (Optional)</label>
+
+                            <textarea id="acknowledgments" placeholder="Credits, inspirations, or special thanks..."></textarea>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Loading State -->
+
+                    <div class="loading" id="loading">
+
+                        <div class="spinner"></div>
+
+                        <h3>🤖 AI is crafting your README...</h3>
+
+                        <p>This may take a moment while we generate comprehensive documentation</p>
+
+                    </div>
+
+
+
+                    <!-- Result -->
+
+                    <div class="result" id="result">
+
+                        <h2>✅ Your README is Ready!</h2>
+
+                        <div class="result-controls">
+
+                            <div class="main-actions">
+
+                                <a href="#" class="download-btn" id="downloadBtn">📥 Download README.md</a>
+
+                                <button id="pdfBtn" class="pdf-btn">📄 Export PDF</button>
+
+                                <button id="htmlBtn" class="html-btn">🌐 Export HTML</button>
+
+                                <button id="shareBtn" class="share-btn">🔗 Share Link</button>
+
+                                <button id="copyBtn" class="copy-btn">📋 Copy Markdown</button>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="resultTone">Change Tone & Regenerate:</label>
+
+                                <select id="resultTone">
+
+                                    <option value="professional">Professional & Polished</option>
+
+                                    <option value="friendly">Friendly & Casual</option>
+
+                                    <option value="technical">Technical & Formal</option>
+
+                                    <option value="playful">Playful & Creative</option>
+
+                                    <option value="ai-decide">Let AI Decide</option>
+
+                                    <option value="custom">Custom...</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group" id="resultCustomToneGroup">
+
+                            <label for="resultCustomTone">Define Custom Tone & Regenerate</label>
+
+                            <input type="text" id="resultCustomTone" placeholder="Enter custom tone and press Enter">
+
+                        </div>
+
+                        <div class="preview" id="preview"></div>
+
+                        <div class="button-group">
+
+                            <button class="btn-secondary" onclick="ReadmeGenerator.ui.editDetails()">✏️ Edit Details</button>
+
+                            <button class="btn-secondary" onclick="ReadmeGenerator.storage.saveTemplate()">💾 Save as Template</button>
+
+                            <button class="btn-secondary" id="abTestBtn">🔄 Compare</button>
+
+                            <button class="btn-secondary" id="githubUpdateBtn" disabled title="Coming soon: Direct GitHub integration requires a backend service.">Update on GitHub</button>
+
+                            <button class="btn-secondary" onclick="ReadmeGenerator.events.startOver()">Create Another</button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Error Display -->
+
+                    <div class="error" id="error"></div>
+
+
+
+                    <!-- Navigation Buttons -->
+
+                    <div class="button-group" id="navigation">
+
+                        <button class="btn-secondary" id="prevBtn" onclick="ReadmeGenerator.events.previousStep()">← Previous</button>
+
+                        <button class="btn-primary" id="nextBtn">Next →</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="preview-column" id="preview-column">
+
+                <h3 class="preview-header">Live Preview</h3>
+
+                <div class="preview live-preview" id="live-preview">
+
+                    <!-- Live preview will be rendered here -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="ab-test-result" id="abTestResult">
+
+            <h2>🔬 A/B Comparison</h2>
+
+            <div class="ab-test-columns">
+
+                <div class="ab-test-column" id="abCol1">
+
+                    <h3 id="abColumn1Header"></h3>
+
+                    <div class="preview" id="abPreview1"></div>
+
+                </div>
+
+                <div class="ab-test-column" id="abCol2">
+
+                    <h3 id="abColumn2Header"></h3>
+
+                    <div class="preview" id="abPreview2"></div>
+
+                </div>
+
+            </div>
+
+            <div class="button-group center-content">
+
+                <button class="btn-secondary" onclick="ReadmeGenerator.ui.exitABTest()">← Back to Result</button>
+
+            </div>
+
+        </div>
+
+    <!-- Insights Modal -->
+
+    <div id="insightsModal" class="modal-overlay">
+
+        <div class="modal-content">
+
+            <span class="modal-close" id="modalCloseBtn">&times;</span>
+
+            <h2>Analytics & Insights</h2>
+
+            <div class="modal-tabs">
+
+                <button class="tab-btn active" data-tab="practices">Best Practices</button>
+
+                <button class="tab-btn" data-tab="stats">Usage Statistics</button>
+
+            </div>
+
+
+
+            <!-- Best Practices Tab -->
+
+            <div id="tab-practices" class="tab-content active">
+
+                <h3>Tips for a Great README</h3>
+
+                <p>A well-crafted README is the front door to your project. Here are some tips to make it shine:</p>
+
+                <ul>
+
+                    <li><strong>Clear Title & Subtitle:</strong> Your project name should be prominent, followed by a short, catchy slogan that explains what it does in one sentence.</li>
+
+                    <li><strong>Use Badges:</strong> Badges for build status, version, license, and code coverage add a professional touch and provide quick insights.</li>
+
+                    <li><strong>Visuals are Key:</strong> Include a logo, screenshot, or a GIF of your project in action. It makes your README much more engaging.</li>
+
+                    <li><strong>Comprehensive Installation Guide:</strong> Don't assume user knowledge. Provide clear, step-by-step instructions for different operating systems if necessary.</li>
+
+                    <li><strong>Practical Usage Examples:</strong> Show, don't just tell. Provide copy-pasteable code snippets that demonstrate how to use your project.</li>
+
+                    <li><strong>Clear Contribution Guidelines:</strong> If you want others to contribute, make it easy for them. Explain how to set up the development environment, run tests, and submit pull requests.</li>
+
+                    <li><strong>Keep it Updated:</strong> An outdated README is worse than no README. Make sure to update it with every new version or significant change.</li>
+
+                </ul>
+
+            </div>
+
+
+
+            <!-- Statistics Tab -->
+
+            <div id="tab-stats" class="tab-content">
+
+                <h3>Usage Statistics</h3>
+
+                <p>This data is collected anonymously to help improve the tool. <em>(Note: This is a demonstration. A backend is required for real data.)</em></p>
+
+                <ul>
+
+                    <li><strong>Most Popular Project Type:</strong> Web Application</li>
+
+                    <li><strong>Most Used Language:</strong> JavaScript</li>
+
+                    <li><strong>Most Common License:</strong> MIT</li>
+
+                    <li><strong>Total READMEs Generated:</strong> 1,337</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Examples Modal -->
+
+    <div id="examplesModal" class="modal-overlay">
+
+        <div class="modal-content">
+
+            <span class="modal-close" id="examplesModalCloseBtn">&times;</span>
+
+            <h2>README Examples</h2>
+
+            <div class="examples-modal-layout">
+
+                <div class="examples-list-container">
+
+                    <ul class="examples-list" id="examplesList">
+
+                        <!-- List items will be generated by JS -->
+
+                    </ul>
+
+                </div>
+
+                <div class="examples-preview-container">
+
+                    <div id="examplesTabContent" class="preview">
+
+                        <!-- Content will be loaded here -->
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="app.js"></script>
+
+    <script src="examples.js"></script>
+
+</body>
+
+</html>
