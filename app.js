@@ -48,6 +48,7 @@ const ReadmeGenerator = {
 
         MarkdownRenderer.init();
         ModalManager.init();
+        AccessibilityModule.init();
 
         // Event Listeners
         document.getElementById('tone').addEventListener('change', (e) => {
@@ -75,8 +76,6 @@ const ReadmeGenerator = {
                 this.events.nextStep();
             }
         });
-
-        this.events.setupKeyboardNavigation();
 
         // Initial Data Load
         this.storage.loadDraft();
@@ -112,6 +111,7 @@ const ReadmeGenerator = {
             }
             
             self.ui.updateProgress(self.state.currentStep, self.config.totalSteps);
+            AccessibilityModule.announce(`Step ${step} of ${self.config.totalSteps} shown: ${document.querySelector(`[data-step="${step}"] h2`).textContent}`);
 
             const previewColumn = document.getElementById('preview-column');
             if (step > 1 && step <= self.config.totalSteps) {
@@ -124,6 +124,7 @@ const ReadmeGenerator = {
 
         updateProgress: function(currentStep, totalSteps) {
             const progress = (currentStep / totalSteps) * 100;
+            document.querySelector('.progress-bar').setAttribute('aria-valuenow', currentStep);
             document.getElementById('progressFill').style.width = `${progress}%`;
             document.getElementById('stepIndicator').textContent = `Step ${currentStep} of ${totalSteps}`;
         },
@@ -136,6 +137,7 @@ const ReadmeGenerator = {
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
             errorDiv.scrollIntoView({ behavior: 'smooth' });
+            AccessibilityModule.announce(`Error: ${message}`);
         },
 
         showInfoMessage: function(message) {
@@ -146,6 +148,7 @@ const ReadmeGenerator = {
             infoDiv.style.border = '1px solid var(--info-border)';
             infoDiv.style.display = 'block';
             infoDiv.scrollIntoView({ behavior: 'smooth' });
+            AccessibilityModule.announce(`Info: ${message}`);
         },
 
         hideError: function() {
@@ -213,6 +216,7 @@ const ReadmeGenerator = {
             
             self.ui.setupDownload(readme);
 
+            AccessibilityModule.announce("README generated successfully. You can now preview, download, or copy the content.");
             const copyBtn = document.getElementById('copyBtn');
             copyBtn.onclick = () => self.ui.copyMarkdownToClipboard();
             copyBtn.textContent = '📋 Copy Markdown';
@@ -334,6 +338,7 @@ const ReadmeGenerator = {
             navigator.clipboard.writeText(self.state.generatedReadme).then(() => {
                 const copyBtn = document.getElementById('copyBtn');
                 copyBtn.textContent = '✅ Copied!';
+                AccessibilityModule.announce("Copied to clipboard.");
                 copyBtn.disabled = true;
                 setTimeout(() => {
                     copyBtn.textContent = '📋 Copy Markdown';
@@ -601,6 +606,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
             if (templateData) {
                 self.utils.populateForm(templateData);
                 self.ui.showInfoMessage(`Template successfully imported from '${userRepo}'.`);
+                AccessibilityModule.announce(`Template successfully imported from repository ${userRepo}.`);
             } else {
                 self.ui.showError(`Could not find a '${templateFileName}' file in the '${userRepo}' repository on 'main' or 'master' branch.`);
             }
@@ -765,6 +771,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
             if (template) {
                 self.utils.populateForm(template.data);
                 self.ui.showInfoMessage(`Template "${templateName}" loaded successfully.`);
+                AccessibilityModule.announce(`Template ${templateName} loaded.`);
                 setTimeout(() => self.ui.hideError(), 3000);
             }
         },
@@ -779,6 +786,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
                 let templates = self.storage.getTemplates();
                 templates = templates.filter(t => t.name !== templateName);
                 localStorage.setItem('readmeGeneratorTemplates', JSON.stringify(templates));
+                AccessibilityModule.announce(`Template ${templateName} deleted.`);
                 self.storage.loadTemplates();
             }
         },
@@ -877,6 +885,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
 
                 document.getElementById('abColumn1Header').textContent = originalProvider === 'gemini' ? 'Gemini Result' : 'OpenAI Result';
                 await MarkdownRenderer.render(self.state.generatedReadme, abPreview1);
+                AccessibilityModule.announce("Comparison view ready.");
 
                 document.getElementById('abColumn2Header').textContent = alternateProvider === 'gemini' ? 'Gemini Result' : 'OpenAI Result';
                 await MarkdownRenderer.render(alternateReadme, abPreview2);
@@ -938,37 +947,7 @@ Generate only the README content in valid Markdown format, nothing else.`;
                 } finally {
                     self.ui.hideSkeleton();
                 }
-            }
-        },
-
-        setupKeyboardNavigation: function() {
-            const self = ReadmeGenerator;
-            document.querySelectorAll('.step input:not([type="checkbox"]), .step select').forEach(element => {
-                element.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        document.getElementById('nextBtn').click();
-                    }
-                });
-            });
-
-            document.addEventListener('keydown', (e) => {
-                const isFormActive = document.getElementById('navigation').style.display !== 'none';
-                if (!isFormActive) return;
-
-                const activeElement = document.activeElement;
-                const isEditingText = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA';
-
-                if (e.ctrlKey && !isEditingText) {
-                    if (e.key === 'ArrowRight') {
-                        e.preventDefault();
-                        document.getElementById('nextBtn').click();
-                    } else if (e.key === 'ArrowLeft') {
-                        e.preventDefault();
-                        document.getElementById('prevBtn').click();
-                    }
-                }
-            });
+            };
         },
     },
 

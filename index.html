@@ -77,13 +77,13 @@
 
             <div class="form-column">
                 <form id="readmeForm" class="content">
-                    <div class="progress-bar">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="6" aria-labelledby="stepIndicator">
 
                         <div class="progress-fill" id="progressFill"></div>
 
                     </div>
 
-                    <div class="step-indicator" id="stepIndicator">Step 1 of 6</div>
+                    <div class="step-indicator" id="stepIndicator" role="status">Step 1 of 6</div>
 
 
 
@@ -524,7 +524,7 @@
 
                     <!-- Error Display -->
 
-                    <div class="error" id="error"></div>
+                    <div class="error" id="error" aria-live="polite"></div>
 
 
 
@@ -693,6 +693,7 @@
 
     </div>
 
+    <script src="accessibility.js"></script>
     <script src="performance.js"></script>
     <script src="security.js"></script>
     <script src="app.js"></script>
