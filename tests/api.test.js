@@ -86,6 +86,7 @@ describe('api.js', () => {
             expect(prompt).toContain('Project Name: My Test App');
             expect(prompt).toContain('1. **Tone of Voice**: Write the entire document in a **professional** tone.');
             expect(prompt).not.toContain('SMART FILLING REQUIRED');
+            expect(prompt).toContain('This README was generated with ❤️ by');
         });
 
         it('should include smart filling instructions if fields are unsure', () => {
@@ -100,6 +101,7 @@ describe('api.js', () => {
             const prompt = api.createPrompt(formData);
             expect(prompt).toContain('Project Type: not-sure');
             expect(prompt).toContain('SMART FILLING REQUIRED');
+            expect(prompt).toContain('This README was generated with ❤️ by');
         });
     });
 });

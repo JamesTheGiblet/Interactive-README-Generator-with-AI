@@ -1,0 +1,30 @@
+:root {
+    /* Light Theme Colors */
+    --bg-color: #f4f6f8;
+    --text-color: #24292e;
+    --text-color-light: #586069;
+    --header-bg: #ffffff;
+    --content-bg: #ffffff;
+    --border-color: #e1e4e8;
+    --input-bg: #fafbfc;
+    --input-border: #d1d5da;
+    --btn-primary-bg: #2ea44f;
+    --btn-primary-text: #ffffff;
+    --btn-primary-hover-bg: #2c974b;
+    --btn-secondary-bg: #f6f8fa;
+    --btn-secondary-text: #24292e;
+    --btn-secondary-border: rgba(27, 31, 35, 0.15);
+    --btn-secondary-hover-bg: #f3f4f6;
+    --link-color: #0366d6;
+    --progress-bar-bg: #e1e4e8;
+    --progress-fill-bg: var(--btn-primary-bg);
+    --preview-bg: #f6f8fa;
+    --code-bg: rgba(27, 31, 35, 0.05);
+    --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+    --error-bg: #ffeef0;
+    --error-text: #d73a49;
+    --error-border: #ffc1c8;
+    --info-bg: #e6f7ff;
+    --info-text: #0366d6;
+    --info-border: #91d5ff;
+}

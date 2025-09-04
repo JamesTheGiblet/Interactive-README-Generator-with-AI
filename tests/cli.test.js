@@ -1,18 +1,15 @@
 /**
  * @jest-environment node
  */
+const { version } = require('../package.json');
 
 // Mock dependencies before importing the cli module
 jest.mock('fs');
-jest.mock('node-fetch');
-
-const fs = require('fs');
-const fetch = require('node-fetch');
-const { Response } = jest.requireActual('node-fetch');
+jest.mock('../src/modules/api.cli.js');
 
 describe('cli.js', () => {
     let consoleLogSpy, consoleErrorSpy, processExitSpy, stdoutWriteSpy;
-    let main, parseArgs, api;
+    let main, parseArgs, api, fs;
 
     beforeEach(() => {
         // Reset mocks and spies
@@ -31,11 +28,12 @@ describe('cli.js', () => {
         // Set default process.argv for each test
         process.argv = ['node', 'cli.js'];
 
-        // Import the module inside beforeEach to get a fresh version with mocks
+        // Import modules inside beforeEach AFTER resetting modules to get fresh mocks
+        fs = require('fs');
+        api = require('../src/modules/api.cli.js').api;
         const cli = require('../src/modules/cli.js');
         main = cli.main;
         parseArgs = cli.parseArgs;
-        api = cli.api;
     });
 
     afterEach(() => {
@@ -61,38 +59,81 @@ describe('cli.js', () => {
             
             await expect(main()).rejects.toThrow('process.exit called with code 1');
             
-            expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Usage: node cli.js'));
+            expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('--key <api_key> is required.'));
             expect(processExitSpy).toHaveBeenCalledWith(1);
+        });
+
+        it('should print the version and exit when --version is used', async () => {
+            process.argv.push('--version');
+            await main();
+            expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining(version));
+            expect(processExitSpy).not.toHaveBeenCalled();
+        });
+
+        it('should print the version and exit when -v is used', async () => {
+            process.argv.push('-v');
+            await main();
+            expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining(version));
         });
     });
 
     describe('Successful Generation', () => {
-        it('should analyze, generate, and save a README with correct arguments', async () => {
-            process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'test-api-key', '--provider', 'gemini');
+        it('should run in pro mode when --pro is used', async () => {
+            process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'test-api-key', '--provider', 'gemini', '--pro');
 
-            // Mock the sequence of fetch calls
-            fetch
-                // GitHub API: Get repo info
-                .mockResolvedValueOnce(new Response(JSON.stringify({ name: 'repo', description: 'A test repo', default_branch: 'main' })))
-                // GitHub API: Get file tree
-                .mockResolvedValueOnce(new Response(JSON.stringify({ tree: [] })))
-                // GitHub API: Get package.json (not found)
-                .mockResolvedValueOnce(new Response(null, { status: 404 }))
-                // GitHub API: Get requirements.txt (not found)
-                .mockResolvedValueOnce(new Response(null, { status: 404 }))
-                // Gemini API call
-                .mockResolvedValueOnce(new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '## Generated README' }] } }] })));
+            // Mock the API methods
+            api.fetchAndParseRepo.mockResolvedValue({ projectName: 'repo' });
+            api.createPrompt.mockReturnValue('Test prompt');
+            api.callAIAPI.mockResolvedValue('## Generated README');
 
-            // The main function should resolve without throwing an error (or calling process.exit)
             await expect(main()).resolves.toBeUndefined();
 
-            // Verify the correct APIs were called and the file was written.
-            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('api.github.com/repos/user/repo'), expect.any(Object));
-            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('generativelanguage.googleapis.com'), expect.any(Object));
+            expect(api.fetchAndParseRepo).toHaveBeenCalledWith('user', 'repo', undefined, true);
+            expect(api.createPrompt).toHaveBeenCalledWith(expect.any(Object), true);
             expect(fs.writeFileSync).toHaveBeenCalledWith('README.md', '## Generated README');
+            expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Running in Pro Mode'));
+        });
+
+        it('should use the --out argument to specify the output file', async () => {
+            process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'test-key', '--out', 'CUSTOM_README.md');
+
+            // Mock the API methods
+            api.fetchAndParseRepo.mockResolvedValue({ projectName: 'repo' });
+            api.createPrompt.mockReturnValue('Test prompt');
+            api.callAIAPI.mockResolvedValue('## Custom README');
+
+            await expect(main()).resolves.toBeUndefined();
+
+            expect(fs.writeFileSync).toHaveBeenCalledWith('CUSTOM_README.md', '## Custom README');
             expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Successfully saved to'));
-            // Ensure it did not try to exit with an error code
-            expect(processExitSpy).not.toHaveBeenCalled();
+        });
+
+        it('should pass the --token argument to the GitHub API call', async () => {
+            const fakeToken = 'ghp_fake_token_string';
+            process.argv.push('--repo', 'https://github.com/user/private-repo', '--key', 'test-key', '--token', fakeToken, '--pro');
+
+            // Mock the API methods
+            api.fetchAndParseRepo.mockResolvedValue({ projectName: 'private-repo' });
+            api.createPrompt.mockReturnValue('Test prompt');
+            api.callAIAPI.mockResolvedValue('## Private Repo README');
+
+            await expect(main()).resolves.toBeUndefined();
+
+            expect(api.fetchAndParseRepo).toHaveBeenCalledWith('user', 'private-repo', fakeToken, true);
+        });
+
+        it('should run in free mode by default', async () => {
+            process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'test-key');
+
+            api.fetchAndParseRepo.mockResolvedValue({ projectName: 'repo' });
+            api.createPrompt.mockReturnValue('Free prompt');
+            api.callAIAPI.mockResolvedValue('## Free README');
+
+            await expect(main()).resolves.toBeUndefined();
+
+            expect(api.fetchAndParseRepo).toHaveBeenCalledWith('user', 'repo', undefined, false); // isPro = false
+            expect(api.createPrompt).toHaveBeenCalledWith(expect.any(Object), false); // isPro = false
+            expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Running in Free Mode'));
         });
     });
 
@@ -100,30 +141,38 @@ describe('cli.js', () => {
         it('should handle GitHub API failures gracefully', async () => {
             process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'test-api-key');
 
-            // Mock a failed fetch call to GitHub
-            // This will cause `repoInfo` to be null, and our cli should throw a specific error.
-            fetch.mockResolvedValueOnce(new Response(null, { status: 404 }));
+            // Mock the API to throw an error
+            api.fetchAndParseRepo.mockImplementation(async () => {
+                throw new Error('Repository not found or access denied.');
+            });
 
             await expect(main()).rejects.toThrow('process.exit called with code 1');
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error: Repository not found or access denied.'));
+            expect(api.callAIAPI).not.toHaveBeenCalled();
         });
 
         it('should handle AI API failures gracefully', async () => {
             process.argv.push('--repo', 'https://github.com/user/repo', '--key', 'bad-key', '--provider', 'openai');
 
-            fetch
-                .mockResolvedValueOnce(new Response(JSON.stringify({ name: 'repo', default_branch: 'main' })))
-                .mockResolvedValueOnce(new Response(JSON.stringify({ tree: [] })))
-                // Mock file fetches to avoid undefined fetch responses
-                .mockResolvedValueOnce(new Response(null, { status: 404 })) // package.json
-                .mockResolvedValueOnce(new Response(null, { status: 404 })) // requirements.txt
-                // AI API call that fails
-                .mockResolvedValueOnce(new Response(JSON.stringify({ error: { message: 'Invalid key' } }), { status: 401 }));
+            api.createPrompt.mockReturnValue('Test prompt');
+            api.fetchAndParseRepo.mockResolvedValue({ projectName: 'repo' });
+            api.callAIAPI.mockImplementation(async () => {
+                throw new Error('Invalid key');
+            });
 
             await expect(main()).rejects.toThrow('process.exit called with code 1');
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error: Invalid key'));
+        });
+
+        it('should handle invalid GitHub URL format', async () => {
+            process.argv.push('--repo', 'not-a-url', '--key', 'test-api-key');
+
+            await expect(main()).rejects.toThrow('process.exit called with code 1');
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid GitHub repository URL format.'));
+            expect(api.fetchAndParseRepo).not.toHaveBeenCalled();
         });
     });
 });

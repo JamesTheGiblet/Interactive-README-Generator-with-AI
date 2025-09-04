@@ -7,7 +7,7 @@
     "readme-pro": "./cli.js"
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --no-warnings ./node_modules/jest/bin/jest.js",
     "build": "node build.js",
     "prepare": "node scripts/prepare.js",
     "clean": "node -e \"require('fs').unlink('cli.js', (err) => { if (err && err.code !== 'ENOENT') throw err; })\""

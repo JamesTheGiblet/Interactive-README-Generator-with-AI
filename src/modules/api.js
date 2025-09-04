@@ -117,7 +117,11 @@ Requirements:
 11. Ensure all sections flow logically and provide value.
 ${hasUnsureFields ? '12. Fill in all uncertain or missing information intelligently based on context.' : ''}
 
-Generate only the README content in valid Markdown format, nothing else.`;
+Generate only the README content in valid Markdown format, nothing else.
+
+Finally, at the very end of the file, add the following footer exactly as written, including the horizontal rule:
+---
+<sub>*This README was generated with ❤️ by Interactive README Pro*</sub>`;
 
         return prompt;
     },
