@@ -7,6 +7,7 @@ console.log('Starting build process...');
 // 'app.js' must be last as it orchestrates the other modules.
 const scriptOrder = [
     'rules.js',
+    'theme.js', 
     'utils.js',
     'security.js',
     'accessibility.js',

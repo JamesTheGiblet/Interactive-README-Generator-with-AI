@@ -35,24 +35,13 @@ const ReadmeGenerator = {
     api: api,
     storage: storage,
     ui: ui,
+    theme: theme,
     utils: utils,
 
     // INITIALIZATION
     init: async function() {
-        // Theme switcher logic
-        const themeCheckbox = document.getElementById('theme-checkbox');
-
-        // The <head> script has already set the theme. We just need to sync the checkbox state.
-        themeCheckbox.checked = document.documentElement.classList.contains('dark-theme');
-
-        // Update theme on toggle
-        themeCheckbox.addEventListener('change', () => {
-            const isDarkMode = themeCheckbox.checked;
-            // Toggle the class on the <html> element to match the CSS and the initial script
-            document.documentElement.classList.toggle('dark-theme', isDarkMode);
-            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-        });
-
+        // Initialize all modules
+        this.theme.init();
         MarkdownRenderer.init();
         ModalManager.init();
         AccessibilityModule.init();
