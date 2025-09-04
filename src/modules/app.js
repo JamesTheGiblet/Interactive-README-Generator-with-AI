@@ -179,7 +179,7 @@ const ReadmeGenerator = {
             const preview = document.getElementById('preview');
             const downloadBtn = document.getElementById('downloadBtn');
 
-            preview.innerHTML = `<div class="loading" style="display: block; padding: 40px;"><div class="spinner"></div><p>Applying new tone...</p></div>`;
+            preview.innerHTML = `<div class="loading-indicator"><div class="spinner"></div><p>Applying new tone...</p></div>`;
             downloadBtn.classList.add('is-loading');
             resultToneSelect.disabled = true;
 
@@ -259,8 +259,7 @@ const ReadmeGenerator = {
             
             ReadmeGenerator.storage.loadApiKeyFromStorage();
 
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('navigation').style.display = 'flex';
+            ReadmeGenerator.ui.setView('form');
             ReadmeGenerator.ui.showStep(1);
             ReadmeGenerator.ui.hideError();
         },

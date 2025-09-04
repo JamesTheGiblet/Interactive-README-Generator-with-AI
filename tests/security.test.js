@@ -67,11 +67,15 @@ describe('SecurityModule', () => {
 
             expect(mockCrypto.subtle.importKey).toHaveBeenCalled();
             expect(mockCrypto.subtle.deriveKey).toHaveBeenCalled();
-            expect(mockCrypto.subtle.encrypt).toHaveBeenCalledWith(
-                { name: 'AES-GCM', iv: expect.any(Uint8Array) },
-                mockDerivedKey,
-                expect.any(Uint8Array)
-            );
+
+            // Check the call to encrypt more robustly by inspecting the arguments
+            expect(mockCrypto.subtle.encrypt).toHaveBeenCalledTimes(1);
+            const encryptCallArgs = mockCrypto.subtle.encrypt.mock.calls[0];
+            expect(encryptCallArgs[0]).toEqual({ name: 'AES-GCM', iv: expect.any(Uint8Array) });
+            expect(encryptCallArgs[1]).toBe(mockDerivedKey);
+            expect(Object.prototype.toString.call(encryptCallArgs[2])).toBe('[object Uint8Array]');
+            expect(new TextDecoder().decode(encryptCallArgs[2])).toBe(plaintext);
+
             expect(encrypted).toMatch(/^v2:/);
         });
 

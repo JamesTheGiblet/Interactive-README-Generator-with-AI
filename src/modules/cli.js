@@ -268,12 +268,22 @@ async function main() {
     console.log(`${C.FgGreen}✓ Successfully saved to ${path.resolve(outputFile)}${C.Reset}`);
 }
 
-main().catch(err => {
-    // Ensure spinner is cleared on error
-    const activeIntervals = setInterval(() => {}, 1000);
-    for(let i = 0; i < activeIntervals; i++) clearInterval(i);
-    process.stdout.write('\r');
+// This allows the script to be run directly but also to be required for testing
+if (require.main === module) {
+    main().catch(err => {
+        // Ensure spinner is cleared on error
+        const activeIntervals = setInterval(() => {}, 1000); 
+        for(let i = 0; i < activeIntervals; i++) clearInterval(i);
+        process.stdout.write('\r');
 
-    console.error(`\n${C.FgRed}Error: ${err.message}${C.Reset}`);
-    process.exit(1);
-});
+        console.error(`\n${C.FgRed}Error: ${err.message}${C.Reset}`);
+        process.exit(1);
+    });
+}
+
+// Export for testing
+module.exports = {
+    parseArgs,
+    api,
+    main
+};

@@ -52,7 +52,7 @@ describe('ui.js', () => {
                         <option value="web-app">Web App</option>
                         <option value="cli">CLI Tool</option>
                     </select>
-                    <div data-field="api" style="display: flex;">
+                    <div data-field="api">
                         <input type="checkbox" id="includeAPI">
                     </div>
                 </div>
@@ -62,7 +62,7 @@ describe('ui.js', () => {
 
             <div class="progress-bar" aria-valuenow="1"><div id="progressFill" style="width: 16.66%;"></div></div>
             <div id="stepIndicator"></div>
-            <button id="prevBtn" style="display: none;"></button>
+            <button id="prevBtn" class="hidden"></button>
             <button id="nextBtn">Next →</button>
 
             <div id="preview-column" class="is-visible">
@@ -174,7 +174,7 @@ describe('ui.js', () => {
             expect(document.querySelector('[data-step="1"]').classList.contains('active')).toBe(false);
             expect(document.querySelector('[data-step="2"]').classList.contains('active')).toBe(true);
             expect(document.getElementById('nextBtn').textContent).toBe('Next →');
-            expect(document.getElementById('prevBtn').style.display).toBe('block');
+            expect(document.getElementById('prevBtn').classList.contains('hidden')).toBe(false);
             expect(AccessibilityModule.announce).toHaveBeenCalledWith('Step 2 of 6 shown: Step 2 Title');
         });
     });
@@ -249,8 +249,18 @@ describe('ui.js', () => {
             
             ui.updateFieldVisibility();
             
-            expect(apiField.style.display).toBe('none');
+            expect(apiField.classList.contains('hidden')).toBe(true);
             expect(document.getElementById('includeAPI').checked).toBe(false);
+        });
+
+        it('should show API field for project types that use it', () => {
+            const apiField = document.querySelector('[data-field="api"]');
+            apiField.classList.add('hidden'); // Start with it hidden
+            document.getElementById('projectType').value = 'web-app';
+            
+            ui.updateFieldVisibility();
+            
+            expect(apiField.classList.contains('hidden')).toBe(false);
         });
     });
 });

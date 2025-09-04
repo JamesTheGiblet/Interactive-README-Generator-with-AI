@@ -143,3 +143,7 @@ const ModalManager = {
         if (window.AccessibilityModule) AccessibilityModule.announce('Modal closed.');
     }
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { ModalManager };
+}

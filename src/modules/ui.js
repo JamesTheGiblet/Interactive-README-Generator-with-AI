@@ -12,7 +12,7 @@ const ui = {
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         
-        prevBtn.style.display = step > 1 ? 'block' : 'none';
+        prevBtn.classList.toggle('hidden', step <= 1);
         
         if (step === ReadmeGenerator.config.totalSteps) {
             nextBtn.textContent = '🚀 Generate README';
@@ -260,11 +260,11 @@ const ui = {
     updateFieldVisibility: function() {
         const projectType = document.getElementById('projectType').value;
         const apiField = document.querySelector('[data-field="api"]');
+        const shouldShow = ['web-app', 'api', 'mobile-app', 'library', 'desktop-app'].includes(projectType);
         
-        if (['web-app', 'api', 'mobile-app', 'library', 'desktop-app'].includes(projectType)) {
-            apiField.style.display = 'flex';
-        } else {
-            apiField.style.display = 'none';
+        apiField.classList.toggle('hidden', !shouldShow);
+
+        if (!shouldShow) {
             document.getElementById('includeAPI').checked = false;
         }
     },

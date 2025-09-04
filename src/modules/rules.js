@@ -217,3 +217,7 @@ Remember: Your README isn't documentation—it's marketing material that happens
 Your README should make someone think: "This solves my exact problem and I can try it right now."
 `
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { ReadmeRules };
+}

@@ -15,3 +15,7 @@ const analytics = {
         // }).catch(err => console.error('Analytics tracking failed:', err));
     }
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { analytics };
+}

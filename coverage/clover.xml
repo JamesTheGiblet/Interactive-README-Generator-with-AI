@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1756934307987" clover="3.2.0">
-  <project timestamp="1756934307987" name="All files">
+<coverage generated="1756934785158" clover="3.2.0">
+  <project timestamp="1756934785158" name="All files">
     <metrics statements="1022" coveredstatements="371" conditionals="563" coveredconditionals="142" methods="186" coveredmethods="45" elements="1771" coveredelements="558" complexity="0" loc="1022" ncloc="1022" packages="1" files="14" classes="14"/>
     <file name="accessibility.js" path="C:\Users\gilbe\Documents\GitHub\Interactive-README-Generator-with-AI-Pro\src\modules\accessibility.js">
       <metrics statements="48" coveredstatements="0" conditionals="36" coveredconditionals="0" methods="9" coveredmethods="0"/>

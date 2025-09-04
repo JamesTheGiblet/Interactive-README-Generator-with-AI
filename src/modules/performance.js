@@ -67,3 +67,7 @@ const PerformanceOptimizer = {
     console.log('Virtualizing preview for performance. (This is a placeholder for a full implementation)');
   }
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { PerformanceOptimizer };
+}
