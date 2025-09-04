@@ -35,13 +35,12 @@ const ReadmeGenerator = {
     api: api,
     storage: storage,
     ui: ui,
-    theme: theme,
     utils: utils,
 
     // INITIALIZATION
     init: async function() {
         // Initialize all modules
-        this.theme.init();
+        this.ui.init();
         MarkdownRenderer.init();
         ModalManager.init();
         AccessibilityModule.init();

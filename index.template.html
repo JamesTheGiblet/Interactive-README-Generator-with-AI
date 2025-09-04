@@ -10,20 +10,6 @@
 
     <title>README Generator - Powered by Gemini AI</title>
 
-    <script>
-        // This script runs before the page is rendered to set the theme.
-        // It prevents a "flash of the wrong theme" by checking localStorage and system preferences.
-        (function() {
-            const storedTheme = localStorage.getItem('theme');
-            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            // Use stored theme if it exists, otherwise use system preference.
-            if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
-                document.documentElement.classList.add('dark-theme');
-            }
-        })();
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark-theme">
@@ -34,7 +20,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <link rel="stylesheet" href="src/styles/main.css">
-    <link rel="stylesheet" href="src/styles/themes/dark.css">
 
 
 </head>
@@ -45,31 +30,11 @@
 
         <div class="header">
 
-            <div class="header-buttons">
-
-                <button class="btn-secondary" id="insightsBtn">📊 Insights & Tips</button>
-
-                <button class="btn-secondary" id="examplesBtn">📚 Examples</button>
-
-            </div>
-
             <div class="header-content">
 
                 <h1>🚀 README Generator</h1>
 
                 <p>Powered by Gemini AI - Create professional documentation effortlessly</p>
-
-            </div>
-
-            <div class="theme-switch-wrapper">
-
-                <label class="theme-switch" for="theme-checkbox">
-
-                    <input type="checkbox" id="theme-checkbox" title="Toggle dark/light theme" />
-
-                    <div class="slider round"></div>
-
-                </label>
 
             </div>
 
@@ -504,13 +469,6 @@
                                         <option value="ai-decide">Let AI Decide</option>
                                         <option value="custom">Custom...</option>
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Preview Theme:</label>
-                                    <div class="button-group-toggle">
-                                        <button type="button" class="btn-secondary" id="previewThemeDarkBtn">Dark</button>
-                                        <button type="button" class="btn-secondary" id="previewThemeLightBtn">Light</button>
-                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -12,7 +12,6 @@ const scriptOrder = [
     'security.js',
     'accessibility.js',
     'markdown.js',
-    'modal.js',
     'performance.js',
     'analytics.js',
     'api.js',
