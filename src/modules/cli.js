@@ -220,65 +220,66 @@ Generate only the README content in valid Markdown format.`;
  * Main execution function for the CLI.
  */
 async function main() {
-    const args = parseArgs();
-
-    if (!args.repo || !args.key) {
-        console.log(`${C.Bright}Interactive README Pro CLI${C.Reset}`);
-        console.log("Usage: node cli.js --repo <github_url> --key <api_key> [options]");
-        console.log("\nOptions:");
-        console.log("  --provider <name>  AI provider to use (gemini or openai). Default: openai");
-        console.log("  --out <file_path>  Output file path. Default: README.md");
-        console.log("  --token <gh_token> GitHub Personal Access Token for private repos.");
-        return;
-    }
-
-    const provider = args.provider || 'openai';
-    const outputFile = args.out || 'README.md';
-
-    console.log(`${C.FgBlue}Starting README generation for ${args.repo}...${C.Reset}`);
-
-    // 1. Analyze Repository
-    let owner, repo;
+    let interval;
     try {
-        const url = new URL(args.repo);
-        [owner, repo] = url.pathname.substring(1).split('/').slice(0, 2);
-    } catch (e) {
-        throw new Error("Invalid GitHub repository URL format. Please use a full URL.");
-    }
-    
-    const spinner = ['|', '/', '-', '\\'];
-    let i = 0;
-    const interval = setInterval(() => {
-        process.stdout.write(`\r${C.FgYellow}Analyzing repository... ${spinner[i++ % spinner.length]}${C.Reset}`);
-    }, 100);
+        const args = parseArgs();
 
-    const repoData = await api.fetchAndParseRepo(owner, repo, args.token);
-    clearInterval(interval);
-    process.stdout.write(`\r${C.FgGreen}✓ Repository analysis complete.${C.Reset}\n`);
+        if (!args.repo || !args.key) {
+            console.log(`${C.Bright}Interactive README Pro CLI${C.Reset}`);
+            console.log("Usage: node cli.js --repo <github_url> --key <api_key> [options]");
+            console.log("\nOptions:");
+            console.log("  --provider <name>  AI provider to use (gemini or openai). Default: openai");
+            console.log("  --out <file_path>  Output file path. Default: README.md");
+            console.log("  --token <gh_token> GitHub Personal Access Token for private repos.");
+            process.exit(1);
+        }
 
-    // 2. Create Prompt and Call AI
-    process.stdout.write(`${C.FgYellow}Generating README with ${provider}...${C.Reset}`);
-    const prompt = api.createPrompt(repoData);
-    const readmeContent = await api.callAIAPI(provider, args.key, prompt);
-    process.stdout.write(`\r${C.FgGreen}✓ README content generated.${C.Reset}\n`);
+        const provider = args.provider || 'openai';
+        const outputFile = args.out || 'README.md';
 
-    // 3. Save File
-    const finalContent = readmeContent.replace(/```markdown\n/g, '').replace(/```/g, '').trim();
-    fs.writeFileSync(outputFile, finalContent);
-    console.log(`${C.FgGreen}✓ Successfully saved to ${path.resolve(outputFile)}${C.Reset}`);
-}
+        console.log(`${C.FgBlue}Starting README generation for ${args.repo}...${C.Reset}`);
 
-// This allows the script to be run directly but also to be required for testing
-if (require.main === module) {
-    main().catch(err => {
-        // Ensure spinner is cleared on error
-        const activeIntervals = setInterval(() => {}, 1000); 
-        for(let i = 0; i < activeIntervals; i++) clearInterval(i);
+        // 1. Analyze Repository
+        let owner, repo;
+        try {
+            const url = new URL(args.repo);
+            [owner, repo] = url.pathname.substring(1).split('/').slice(0, 2);
+        } catch (e) {
+            throw new Error("Invalid GitHub repository URL format. Please use a full URL.");
+        }
+        
+        const spinner = ['|', '/', '-', '\\'];
+        let i = 0;
+        interval = setInterval(() => {
+            process.stdout.write(`\r${C.FgYellow}Analyzing repository... ${spinner[i++ % spinner.length]}${C.Reset}`);
+        }, 100);
+
+        const repoData = await api.fetchAndParseRepo(owner, repo, args.token);
+        clearInterval(interval);
+        process.stdout.write(`\r${C.FgGreen}✓ Repository analysis complete.${C.Reset}\n`);
+
+        // 2. Create Prompt and Call AI
+        process.stdout.write(`${C.FgYellow}Generating README with ${provider}...${C.Reset}`);
+        const prompt = api.createPrompt(repoData);
+        const readmeContent = await api.callAIAPI(provider, args.key, prompt);
+        process.stdout.write(`\r${C.FgGreen}✓ README content generated.${C.Reset}\n`);
+
+        // 3. Save File
+        const finalContent = readmeContent.replace(/```markdown\n/g, '').replace(/```/g, '').trim();
+        fs.writeFileSync(outputFile, finalContent);
+        console.log(`${C.FgGreen}✓ Successfully saved to ${path.resolve(outputFile)}${C.Reset}`);
+    } catch (err) {
+        if (interval) clearInterval(interval);
         process.stdout.write('\r');
 
         console.error(`\n${C.FgRed}Error: ${err.message}${C.Reset}`);
         process.exit(1);
-    });
+    }
+}
+
+// This allows the script to be run directly but also to be required for testing
+if (require.main === module) {
+    main();
 }
 
 // Export for testing

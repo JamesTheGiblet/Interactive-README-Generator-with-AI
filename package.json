@@ -8,7 +8,9 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "node build.js"
+    "build": "node build.js",
+    "prepare": "node scripts/prepare.js",
+    "clean": "node -e \"require('fs').unlink('cli.js', (err) => { if (err && err.code !== 'ENOENT') throw err; })\""
   },
   "keywords": [
     "readme",

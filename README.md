@@ -30,33 +30,53 @@ README Pro integrates directly with your source code and development tools. It a
 ## Pro Features in Detail
 
 - 🚀 **Direct GitHub Repo Analysis:** Provide a GitHub repository URL and let the AI analyze your file structure, dependencies, and source code to automatically generate a complete, high-quality README.
-- 💻 **Powerful CLI Tool:** Use `readme-pro generate` to create READMEs locally or integrate it into your CI/CD pipelines to ensure every new project is instantly documented.
+- 💻 **Powerful CLI Tool:** Use `readme-pro` to create READMEs locally or integrate it into your CI/CD pipelines to ensure every new project is instantly documented.
 - 🔄 **AI-Powered Syncing:** *(Conceptual)* Keep your documentation synchronized with your codebase. This feature is designed to analyze pull requests for changes (new dependencies, environment variables, etc.) and automatically suggest README updates. **Note:** This requires a backend service and GitHub App integration, which is not part of the client-side application.
 - 🏢 **Team Templates & Policies:** Define and share custom README templates across your organization. Enforce required sections like "Security Policy," "Contributor Guidelines," or "Deployment Instructions" to maintain standards.
 - 📊 **README Analytics:** *(Coming Soon)* Gain insights into how users interact with your documentation. Track which sections are most viewed and get AI-driven suggestions to improve clarity and engagement.
 
 ## Getting Started with the CLI
 
-### 1. Installation
+### For End-Users
 
-To use the CLI tool, you need to have Node.js installed. Then, install the necessary dependencies:
+#### 1. Installation
 
-```bash
-npm install
-```
+Install the CLI tool globally via npm (once published):
 
-### 2. Usage
+`npm install -g interactive-readme-pro`
 
-Run the CLI from your terminal, providing a repository URL and your AI provider's API key.
+#### 2. Usage
+
+Run the `readme-pro` command from your terminal.
 
 ```bash
 # Usage: readme-pro --repo <github_url> --key <api_key> [options]
 
 # Example with OpenAI
-node cli.js --repo https://github.com/gilbarbara/react-joyride --key sk-YourOpenAIKey
+readme-pro --repo https://github.com/gilbarbara/react-joyride --key sk-YourOpenAIKey
 
 # Example with Gemini and a specific output file
-node cli.js --repo https://github.com/google/go-cloud --key YourGeminiApiKey --provider gemini --out GO_CLOUD_README.md
+readme-pro --repo https://github.com/google/go-cloud --key YourGeminiApiKey --provider gemini --out GO_CLOUD_README.md
+```
+
+### For Developers (Contributing)
+
+#### 1. Setup
+
+Clone the repository and install dependencies. The `npm install` command will also run the `prepare` script, which makes the CLI script available at the project root.
+
+```bash
+git clone https://github.com/your-username/Interactive-README-Generator-with-AI-Pro.git
+cd Interactive-README-Generator-with-AI-Pro
+npm install
+```
+
+#### 2. Running Locally
+
+After setup, you can run the CLI directly using `node` from the project root:
+
+```bash
+node cli.js --repo https://github.com/gilbarbara/react-joyride --key sk-YourOpenAIKey
 ```
 
 ## Get Your Pro License
