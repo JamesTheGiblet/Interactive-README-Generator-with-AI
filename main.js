@@ -78,99 +78,14 @@ async function generateReadme() {
     previewContainer.innerHTML = '<div class="d-flex align-items-center p-4"><strong role="status">Generating with AI...</strong><div class="spinner-border ms-auto" aria-hidden="true"></div></div>';
     
     // Simulate AI generation
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network/AI delay
 
-    // 1. Data Collection
-    const data = {
-        projectName: document.getElementById('projectName').value,
-        description: document.getElementById('description').value,
-        version: document.getElementById('version').value,
-        primaryLanguage: document.getElementById('primaryLanguage').value,
-        githubUrl: document.getElementById('githubUrl').value,
-        keyFeatures: document.getElementById('keyFeatures').value,
-        installation: document.getElementById('installation').value,
-        usage: document.getElementById('usage').value,
-        license: document.getElementById('license').value,
-        author: document.getElementById('author').value,
-        email: document.getElementById('email').value,
-        website: document.getElementById('website').value,
-        includeBadges: document.getElementById('includeBadges').checked,
-        includeContributing: document.getElementById('contributing').checked,
-        includeChangelog: document.getElementById('changelog').checked,
-        includeRoadmap: document.getElementById('roadmap').checked,
-        includeFaq: document.getElementById('faq').checked,
-        includeAcknowledgments: document.getElementById('acknowledgments').checked,
-        includeScreenshots: document.getElementById('screenshots').checked,
-    };
+    const data = getReadmeData();
+    const readmeContent = buildReadmeContent(data);
 
-    // 2. README Content Generation
-    const readmeParts = [];
-
-    // Title
-    readmeParts.push(`# ${data.projectName || 'My Awesome Project'}`);
-
-    // Badges
-    if (data.includeBadges) {
-        const badges = generateBadges(data);
-        if (badges) readmeParts.push(badges);
-    }
-
-    // Description
-    readmeParts.push(data.description || 'A brief description of what your project does.');
-
-    // Key Features
-    if (data.keyFeatures) {
-        readmeParts.push(`## ✨ Key Features\n\n${data.keyFeatures}`);
-    }
-
-    // Screenshots
-    if (data.includeScreenshots) {
-        readmeParts.push(`## 📸 Screenshots\n\n*Add your screenshots here. For example:*\n\n!App Screenshot`);
-    }
-
-    // Installation
-    if (data.installation) {
-        const lang = data.primaryLanguage ? data.primaryLanguage.toLowerCase() : 'bash';
-        readmeParts.push(`## 🚀 Installation\n\n\`\`\`${lang}\n${data.installation}\n\`\`\``);
-    }
-
-    // Usage
-    if (data.usage) {
-        const lang = data.primaryLanguage ? data.primaryLanguage.toLowerCase() : 'javascript';
-        readmeParts.push(`## 💡 Usage\n\n\`\`\`${lang}\n${data.usage}\n\`\`\``);
-    }
-
-    // Roadmap
-    if (data.includeRoadmap) {
-        readmeParts.push(`## 🗺️ Roadmap\n\n- [ ] Additional Feature 1\n- [ ] Additional Feature 2`);
-    }
-
-    // Contributing
-    if (data.includeContributing) {
-        readmeParts.push(`## 🤝 Contributing\n\nContributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.\n\nIf you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".`);
-    }
-
-    // License
-    if (data.license && data.license !== 'Custom') {
-        readmeParts.push(`## 📄 License\n\nThis project is licensed under the ${data.license} License. See the \`LICENSE\` file for more information.`);
-    } else if (data.license === 'Custom') {
-        readmeParts.push(`## 📄 License\n\nSee the \`LICENSE\` file for license information.`);
-    }
-
-    // Author / Contact
-    const contactInfo = [data.author ? `**${data.author}**` : '', data.email ? `- Email: ${data.email}` : '', data.website ? `- Website: ${data.website}` : ''].filter(Boolean);
-    if (contactInfo.length > 0) {
-        readmeParts.push(`## 👤 Author\n\n${contactInfo.join('\n')}`);
-    }
-
-    // Acknowledgments
-    if (data.includeAcknowledgments) {
-        readmeParts.push(`## 🙏 Acknowledgments\n\n- Awesome README Templates\n- Shields.io`);
-    }
-
-    // 3. Final Assembly & Display
-    const readmeContent = readmeParts.join('\n\n');
-    previewContainer.innerHTML = `<pre class="m-0">${readmeContent.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`;
+    // Sanitize content for safe HTML display inside <pre> tag
+    const sanitizedContent = readmeContent.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    previewContainer.innerHTML = `<pre class="m-0">${sanitizedContent}</pre>`;
 }
 
 function copyReadme() {
@@ -206,19 +121,109 @@ function startOver() {
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     currentStep = 1;
     updateStepAndProgress();
+
     const readmePreview = document.getElementById('readmePreview');
     if (readmePreview) {
         readmePreview.innerHTML = '<!-- Generated README will appear here -->';
-    }
-    const progressBar = document.getElementById('progressBar');
-    if (progressBar) {
-        progressBar.style.width = '25%';
-        progressBar.setAttribute('aria-valuenow', 25);
     }
     showToast('Form has been reset.', 'info');
 }
 
 function shareReadme() { showToast('Share functionality coming soon!', 'info'); }
+
+// --- Helper Functions ---
+
+/**
+ * Gathers all data from the form fields.
+ * @returns {object} An object containing all form data.
+ */
+function getReadmeData() {
+    return {
+        projectName: document.getElementById('projectName').value,
+        description: document.getElementById('description').value,
+        version: document.getElementById('version').value,
+        primaryLanguage: document.getElementById('primaryLanguage').value,
+        githubUrl: document.getElementById('githubUrl').value,
+        keyFeatures: document.getElementById('keyFeatures').value,
+        installation: document.getElementById('installation').value,
+        usage: document.getElementById('usage').value,
+        license: document.getElementById('license').value,
+        author: document.getElementById('author').value,
+        email: document.getElementById('email').value,
+        website: document.getElementById('website').value,
+        includeBadges: document.getElementById('includeBadges').checked,
+        includeContributing: document.getElementById('contributing').checked,
+        includeChangelog: document.getElementById('changelog').checked,
+        includeRoadmap: document.getElementById('roadmap').checked,
+        includeFaq: document.getElementById('faq').checked,
+        includeAcknowledgments: document.getElementById('acknowledgments').checked,
+        includeScreenshots: document.getElementById('screenshots').checked,
+    };
+}
+
+/**
+ * Builds the complete README markdown string from the provided data.
+ * @param {object} data - The form data from getReadmeData().
+ * @returns {string} The complete README content as a markdown string.
+ */
+function buildReadmeContent(data) {
+    const repoPathMatch = data.githubUrl ? data.githubUrl.match(/github\.com\/([^\/]+\/[^\/]+)/) : null;
+    const repoPath = repoPathMatch && repoPathMatch[1] ? repoPathMatch[1].replace(/\.git$/, '') : null;
+    const parts = [];
+
+    parts.push(`# ${data.projectName || 'My Awesome Project'}`);
+    if (data.includeBadges) parts.push(generateBadges(data, repoPath));
+    parts.push(data.description || 'A brief description of what your project does.');
+    if (data.keyFeatures) parts.push(`## ✨ Key Features\n\n${data.keyFeatures}`);
+    if (data.includeScreenshots) parts.push(`## 📸 Screenshots\n\n*Add your screenshots here. For example:*\n\n!App Screenshot`);
+    
+    if (data.installation) {
+        // Installation instructions are typically shell commands.
+        parts.push(`## 🚀 Installation\n\n\`\`\`bash\n${data.installation}\n\`\`\``);
+    }
+
+    if (data.usage) {
+        const lang = data.primaryLanguage ? data.primaryLanguage.toLowerCase() : 'javascript';
+        parts.push(`## 💡 Usage\n\n\`\`\`${lang}\n${data.usage}\n\`\`\``);
+    }
+
+    if (data.includeRoadmap) {
+        let roadmapContent = `## 🗺️ Roadmap\n\n- [ ] Feature A\n- [ ] Feature B`;
+        if (repoPath) roadmapContent += `\n\nSee the open issues for a full list of proposed features (and known issues).`;
+        parts.push(roadmapContent);
+    }
+
+    if (data.includeContributing) {
+        let contributingContent = `## 🤝 Contributing\n\nContributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.`;
+        if (repoPath) {
+            contributingContent += `\n\n1. Fork the Project\n2. Create your Feature Branch (\`git checkout -b feature/AmazingFeature\`)\n3. Commit your Changes (\`git commit -m 'Add some AmazingFeature'\`)\n4. Push to the Branch (\`git push origin feature/AmazingFeature\`)\n5. Open a Pull Request`;
+        } else {
+            contributingContent += `\n\nIf you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".`;
+        }
+        parts.push(contributingContent);
+    }
+
+    if (data.license && data.license !== 'Custom') {
+        parts.push(`## 📄 License\n\nDistributed under the ${data.license} License. See \`LICENSE\` for more information.`);
+    } else if (data.license === 'Custom') {
+        parts.push(`## 📄 License\n\nSee the \`LICENSE\` file for license information.`);
+    }
+
+    const contactInfo = [
+        data.author ? `**${data.author}**` : '',
+        data.email ? `- <${data.email}>` : '',
+        data.website ? `- Website` : ''
+    ].filter(Boolean);
+    if (contactInfo.length > 0) {
+        parts.push(`## 👤 Author\n\n${contactInfo.join('\n')}`);
+    }
+
+    if (data.includeAcknowledgments) {
+        parts.push(`## 🙏 Acknowledgments\n\n- Awesome README Templates\n- Shields.io\n- Unsplash`);
+    }
+
+    return parts.filter(Boolean).join('\n\n');
+}
 
 function showToast(message, type = 'primary') {
     const toastContainer = document.querySelector('.toast-container');
