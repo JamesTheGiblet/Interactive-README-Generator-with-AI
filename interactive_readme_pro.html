@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive README Pro - AI-Powered Documentation Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="interactive_readme_pro.css">
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">README Pro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#generator">Generator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#cli">CLI</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics">Analytics</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-outline-primary me-2" onclick="showPricing()" title="View Pricing">Pricing</button>
+                    <button type="button" class="btn btn-primary" onclick="scrollToGenerator()" title="Get Started">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1>Your Automated Documentation Partner</h1>
+                    <p class="lead my-4">Stop writing documentation from scratch. Let our AI analyze your code and generate beautiful, comprehensive READMEs in seconds.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-primary" onclick="scrollToGenerator()" title="Get Started for Free">Get Started for Free</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="showDemo()" title="Watch Demo">Watch Demo</button>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1620674156044-52b714665bee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="README Pro Interface" class="img-fluid floating readme-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- README Generator Section -->
+    <section id="generator" class="generator-section">
+        <div class="container">
+            <h2 class="section-title">Generate Your Professional README</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="form-container">
+                      <form id="readmeForm" onsubmit="event.preventDefault(); generateReadme();">
+                        <div class="progress mb-4 custom-progress-height">
+                            <div id="progressBar" class="progress-bar bg-primary" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Form completion progress"></div>
+                        </div>
+                        <div class="form-step active" id="step1" data-step="1">
+                            <h3 class="mb-4">Step 1: Project Information</h3>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">GitHub Repository (Optional)</label>
+                                <div class="github-input-container">
+                                    <input type="url" class="form-control" id="githubUrl" placeholder="https://github.com/username/repository">
+                                    <div class="github-status" id="githubStatus"></div>
+                                </div>
+                                <div class="form-text">Enter a GitHub URL to automatically analyze your repository</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Project Name *</label>
+                                    <input type="text" class="form-control" id="projectName" required title="Project Name" placeholder="Enter project name">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Version</label>
+                                    <input type="text" class="form-control" id="version" placeholder="1.0.0">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Description *</label>
+                                <textarea class="form-control" id="description" rows="3" required placeholder="A brief description of what your project does..."></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Primary Language</label>
+                                    <select class="form-select" id="primaryLanguage" title="Primary Language">
+                                        <option value="">Select language...</option>
+                                        <option value="JavaScript">JavaScript</option>
+                                        <option value="Python">Python</option>
+                                        <option value="Java">Java</option>
+                                        <option value="TypeScript">TypeScript</option>
+                                        <option value="C++">C++</option>
+                                        <option value="C#">C#</option>
+                                        <option value="Go">Go</option>
+                                        <option value="Rust">Rust</option>
+                                        <option value="PHP">PHP</option>
+                                        <option value="Ruby">Ruby</option>
+                                        <option value="Kotlin">Kotlin</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Project Type</label>
+                                    <select class="form-select" id="projectType" title="Project Type">
+                                        <option value="">Select type...</option>
+                                        <option value="Web Application">Web Application</option>
+                                        <option value="Mobile App">Mobile App</option>
+                                        <option value="Desktop Application">Desktop Application</option>
+                                        <option value="Library/Package">Library/Package</option>
+                                        <option value="API/Backend">API/Backend</option>
+                                        <option value="CLI Tool">CLI Tool</option>
+                                        <option value="Game">Game</option>
+                                        <option value="Data Science">Data Science</option>
+                                        <option value="DevOps/Infrastructure">DevOps/Infrastructure</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" onclick="nextStep()" title="Go to Next Step">Next Step <i class="bi bi-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Features & Details -->
+                        <div class="form-step" id="step2" data-step="2">
+                            <h3 class="mb-4">Step 2: Features & Installation</h3>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Key Features</label>
+                                <textarea class="form-control" id="keyFeatures" rows="4" placeholder="• Feature 1&#10;• Feature 2&#10;• Feature 3"></textarea>
+                                <div class="form-text">List the main features of your project (one per line)</div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Installation Instructions</label>
+                                <textarea class="form-control" id="installation" rows="4" placeholder="npm install my-project&#10;# or&#10;pip install my-project"></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Usage Example</label>
+                                <textarea class="form-control" id="usage" rows="4" placeholder="const myProject = require('my-project');&#10;myProject.doSomething();"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">License</label>
+                                    <select class="form-select" id="license" title="License">
+                                        <option value="">Select license...</option>
+                                        <option value="MIT">MIT</option>
+                                        <option value="Apache-2.0">Apache 2.0</option>
+                                        <option value="GPL-3.0">GPL 3.0</option>
+                                        <option value="BSD-3-Clause">BSD 3-Clause</option>
+                                        <option value="ISC">ISC</option>
+                                        <option value="Unlicense">Unlicense</option>
+                                        <option value="Custom">Custom</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Author</label>
+                                    <input type="text" class="form-control" id="author" placeholder="Your Name">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="prevStep()" title="Go to Previous Step"><i class="bi bi-arrow-left"></i> Previous</button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep()" title="Go to Next Step">Next Step <i class="bi bi-arrow-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Customization & Generation -->
+                        <div class="form-step" id="step3" data-step="3">
+                            <h3 class="mb-4">Step 3: Customization & Style</h3>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">README Tone</label>
+                                <select class="form-select" id="tone" title="README Tone">
+                                    <option value="professional">Professional</option>
+                                    <option value="friendly">Friendly & Approachable</option>
+                                    <option value="technical">Technical & Detailed</option>
+                                    <option value="creative">Creative & Engaging</option>
+                                    <option value="minimal">Minimal & Clean</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Include Badges</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="includeBadges" checked>
+                                    <label class="form-check-label" for="includeBadges">Add relevant badges (build status, version, license, etc.)</label>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Additional Sections</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="contributing" checked><label class="form-check-label" for="contributing">Contributing Guidelines</label></div>
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="changelog" checked><label class="form-check-label" for="changelog">Changelog</label></div>
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="roadmap"><label class="form-check-label" for="roadmap">Roadmap</label></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="faq"><label class="form-check-label" for="faq">FAQ Section</label></div>
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="acknowledgments"><label class="form-check-label" for="acknowledgments">Acknowledgments</label></div>
+                                        <div class="form-check"><input class="form-check-input" type="checkbox" id="screenshots"><label class="form-check-label" for="screenshots">Screenshots Section</label></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Contact Information (Optional)</label>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2"><input type="email" class="form-control" id="email" placeholder="your.email@example.com"></div>
+                                    <div class="col-md-6 mb-2"><input type="url" class="form-control" id="website" placeholder="https://yourwebsite.com"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Previous</button>
+                                <button type="submit" class="btn btn-success btn-lg" title="Generate README"><i class="bi bi-magic"></i> Generate README</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Preview & Download -->
+                        <div class="form-step" id="step4" data-step="4">
+                            <h3 class="mb-4">Your Generated README</h3>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Preview</h5>
+                                <div class="btn-group" role="group" aria-label="README Actions">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyReadme()" title="Copy README"><i class="bi bi-clipboard"></i> Copy</button>
+                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadReadme()" title="Download README"><i class="bi bi-download"></i> Download</button>
+                                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="editReadme()" title="Edit README"><i class="bi bi-pencil"></i> Edit</button>
+                                </div>
+                            </div>
+                            <div class="preview-container" id="readmePreview"><!-- Generated README will appear here --></div>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" onclick="startOver()" title="Start Over"><i class="bi bi-arrow-clockwise"></i> Start Over</button>
+                                <button type="button" class="btn btn-primary" onclick="shareReadme()" title="Share README"><i class="bi bi-share"></i> Share README</button>
+                            </div>
+                        </div>
+                      </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="section-title">Professional Features</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-github"></i>
+                        </div>
+                        <h3>GitHub Repo Analysis</h3>
+                        <p>Provide a GitHub repository URL and let the AI analyze your file structure, dependencies, and source code to generate a complete README automatically.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-terminal"></i>
+                        </div>
+                        <h3>Powerful CLI Tool</h3>
+                        <p>Use <code>readme-pro</code> to create READMEs locally or integrate it into your CI/CD pipelines to ensure every new project is instantly documented.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h3>AI-Powered Syncing</h3>
+                        <p>Keep your documentation synchronized with your codebase. Automatically suggests README updates based on pull request changes.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-layers"></i>
+                        </div>
+                        <h3>Team Templates</h3>
+                        <p>Define and share custom README templates across your organization. Enforce required sections to maintain standards.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>README Analytics</h3>
+                        <p>Gain insights into how users interact with your documentation. Track which sections are most viewed and get AI-driven suggestions.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3>Enterprise Security</h3>
+                        <p>SOC 2 compliant with on-premise deployment options. Your code and data remain secure and private.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLI Demo Section -->
+    <section id="cli" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">Powerful Command Line Interface</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="cli-demo">
+                        <div class="mb-3"><span class="cli-prompt">$</span> <span class="cli-command">npm install -g interactive-readme-pro</span></div>
+                        <div class="mb-3"><span class="cli-prompt">$</span> <span class="cli-command">cd my-project</span></div>
+                        <div class="mb-3"><span class="cli-prompt">$</span> <span class="cli-command">readme-pro --repo . --key sk-YourApiKey</span></div>
+                        <div class="mb-3"><span class="cli-comment"># Analyzing repository structure...</span></div>
+                        <div class="mb-3"><span class="cli-comment"># Detected: Node.js project, Express server, MongoDB</span></div>
+                        <div class="mb-3"><span class="cli-comment"># Generating professional README...</span></div>
+                        <div class="mb-3"><span class="cli-comment"># ✓ README.md successfully created</span></div>
+                        <div><span class="cli-prompt">$</span> <span class="cli-command">git add README.md && git commit -m "docs: add professional readme"</span></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h3>Seamless Integration Into Your Workflow</h3>
+                    <p>README Pro's CLI tool works wherever you do—from your local development environment to your CI/CD pipelines.</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0 ps-0"><i class="bi bi-check-circle-fill text-success me-2"></i> Generate documentation without leaving your terminal</li>
+                        <li class="list-group-item border-0 ps-0"><i class="bi bi-check-circle-fill text-success me-2"></i> Integrate with pre-commit hooks for automatic updates</li>
+                        <li class="list-group-item border-0 ps-0"><i class="bi bi-check-circle-fill text-success me-2"></i> Include in CI/CD to ensure all projects are documented</li>
+                        <li class="list-group-item border-0 ps-0"><i class="bi bi-check-circle-fill text-success me-2"></i> Support for all major platforms and shells</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analytics" class="py-5">
+        <div class="container">
+            <h2 class="section-title">README Analytics Dashboard</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="analytics-card">
+                        <div class="analytics-number" id="totalGenerated">2,847</div>
+                        <h5>READMEs Generated</h5>
+                        <p class="text-muted mb-0">This month</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="analytics-card">
+                        <div class="analytics-number" id="hoursSaved">150+</div>
+                        <h5>Hours Saved</h5>
+                        <p class="text-muted mb-0">Via automation</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="analytics-card">
+                        <div class="analytics-number" id="repoCoverage">92%</div>
+                        <h5>Repo Coverage</h5>
+                        <p class="text-muted mb-0">Across organization</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="analytics-card">
+                        <div class="analytics-number" id="developerSatisfaction">4.8/5</div>
+                        <h5>Developer Satisfaction</h5>
+                        <p class="text-muted mb-0">User rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-1">&copy; 2024 README Pro. All Rights Reserved.</p>
+            <ul class="list-inline mb-0">
+                <li class="list-inline-item"><a href="#" class="text-white-50">Privacy</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white-50">Terms</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white-50">Contact</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="interactive_readme_pro.js"></script>
+</body>
+</html>
