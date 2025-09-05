@@ -78,15 +78,98 @@ async function generateReadme() {
     previewContainer.innerHTML = '<div class="d-flex align-items-center p-4"><strong role="status">Generating with AI...</strong><div class="spinner-border ms-auto" aria-hidden="true"></div></div>';
     
     // Simulate AI generation
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    const projectName = document.getElementById('projectName').value || 'My Awesome Project';
-    const description = document.getElementById('description').value || 'A brief description of what your project does.';
-    const installation = document.getElementById('installation').value || 'npm install my-project';
-    const usage = document.getElementById('usage').value || "const myProject = require('my-project');";
-    const license = document.getElementById('license').value || 'MIT';
+    // 1. Data Collection
+    const data = {
+        projectName: document.getElementById('projectName').value,
+        description: document.getElementById('description').value,
+        version: document.getElementById('version').value,
+        primaryLanguage: document.getElementById('primaryLanguage').value,
+        githubUrl: document.getElementById('githubUrl').value,
+        keyFeatures: document.getElementById('keyFeatures').value,
+        installation: document.getElementById('installation').value,
+        usage: document.getElementById('usage').value,
+        license: document.getElementById('license').value,
+        author: document.getElementById('author').value,
+        email: document.getElementById('email').value,
+        website: document.getElementById('website').value,
+        includeBadges: document.getElementById('includeBadges').checked,
+        includeContributing: document.getElementById('contributing').checked,
+        includeChangelog: document.getElementById('changelog').checked,
+        includeRoadmap: document.getElementById('roadmap').checked,
+        includeFaq: document.getElementById('faq').checked,
+        includeAcknowledgments: document.getElementById('acknowledgments').checked,
+        includeScreenshots: document.getElementById('screenshots').checked,
+    };
 
-    const readmeContent = `# ${projectName}\n\n${description}\n\n## Installation\n\n\`\`\`bash\n${installation}\n\`\`\`\n\n## Usage\n\n\`\`\`javascript\n${usage}\n\`\`\`\n\n## License\n\nThis project is licensed under the ${license} License.`;
+    // 2. README Content Generation
+    const readmeParts = [];
+
+    // Title
+    readmeParts.push(`# ${data.projectName || 'My Awesome Project'}`);
+
+    // Badges
+    if (data.includeBadges) {
+        const badges = generateBadges(data);
+        if (badges) readmeParts.push(badges);
+    }
+
+    // Description
+    readmeParts.push(data.description || 'A brief description of what your project does.');
+
+    // Key Features
+    if (data.keyFeatures) {
+        readmeParts.push(`## ✨ Key Features\n\n${data.keyFeatures}`);
+    }
+
+    // Screenshots
+    if (data.includeScreenshots) {
+        readmeParts.push(`## 📸 Screenshots\n\n*Add your screenshots here. For example:*\n\n!App Screenshot`);
+    }
+
+    // Installation
+    if (data.installation) {
+        const lang = data.primaryLanguage ? data.primaryLanguage.toLowerCase() : 'bash';
+        readmeParts.push(`## 🚀 Installation\n\n\`\`\`${lang}\n${data.installation}\n\`\`\``);
+    }
+
+    // Usage
+    if (data.usage) {
+        const lang = data.primaryLanguage ? data.primaryLanguage.toLowerCase() : 'javascript';
+        readmeParts.push(`## 💡 Usage\n\n\`\`\`${lang}\n${data.usage}\n\`\`\``);
+    }
+
+    // Roadmap
+    if (data.includeRoadmap) {
+        readmeParts.push(`## 🗺️ Roadmap\n\n- [ ] Additional Feature 1\n- [ ] Additional Feature 2`);
+    }
+
+    // Contributing
+    if (data.includeContributing) {
+        readmeParts.push(`## 🤝 Contributing\n\nContributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.\n\nIf you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".`);
+    }
+
+    // License
+    if (data.license && data.license !== 'Custom') {
+        readmeParts.push(`## 📄 License\n\nThis project is licensed under the ${data.license} License. See the \`LICENSE\` file for more information.`);
+    } else if (data.license === 'Custom') {
+        readmeParts.push(`## 📄 License\n\nSee the \`LICENSE\` file for license information.`);
+    }
+
+    // Author / Contact
+    const contactInfo = [data.author ? `**${data.author}**` : '', data.email ? `- Email: ${data.email}` : '', data.website ? `- Website: ${data.website}` : ''].filter(Boolean);
+    if (contactInfo.length > 0) {
+        readmeParts.push(`## 👤 Author\n\n${contactInfo.join('\n')}`);
+    }
+
+    // Acknowledgments
+    if (data.includeAcknowledgments) {
+        readmeParts.push(`## 🙏 Acknowledgments\n\n- Awesome README Templates\n- Shields.io`);
+    }
+
+    // 3. Final Assembly & Display
+    const readmeContent = readmeParts.join('\n\n');
     previewContainer.innerHTML = `<pre class="m-0">${readmeContent.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`;
 }
 
@@ -147,6 +230,40 @@ function showToast(message, type = 'primary') {
     const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
     toast.show();
     toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+}
+
+function generateBadges(data) {
+    const badges = [];
+    const style = 'for-the-badge'; // 'flat', 'flat-square', 'plastic', 'social'
+
+    // GitHub License Badge
+    if (data.githubUrl) {
+        const repoPathMatch = data.githubUrl.match(/github\.com\/([^\/]+\/[^\/]+)/);
+        if (repoPathMatch && repoPathMatch[1]) {
+            const repoPath = repoPathMatch[1].replace(/\.git$/, '');
+            if (data.license && data.license !== 'Custom') {
+                badges.push(`[!License](https://github.com/${repoPath}/blob/main/LICENSE)`);
+            }
+        }
+    } else if (data.license && data.license !== 'Custom') {
+        // Fallback license badge if no repo URL
+        const licenseFormatted = data.license.replace('-', '--');
+        badges.push(`!License`);
+    }
+
+    // Version Badge
+    if (data.version) {
+        badges.push(`!Version`);
+    }
+
+    // Primary Language Badge
+    if (data.primaryLanguage && data.primaryLanguage !== 'Other') {
+        const lang = encodeURIComponent(data.primaryLanguage);
+        const logo = lang.toLowerCase();
+        badges.push(`!Language`);
+    }
+
+    return badges.join(' ');
 }
 
 // --- Initialization Function ---
