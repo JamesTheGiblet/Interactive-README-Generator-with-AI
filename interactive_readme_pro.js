@@ -1,21 +1,28 @@
+// --- Global State ---
 let currentStep = 1;
 const totalSteps = 4;
-const progressBar = document.getElementById('progressBar');
+
+// --- Global Functions (callable from HTML via onclick) ---
 
 function updateStepAndProgress() {
+    const progressBar = document.getElementById('progressBar');
+    if (!progressBar) return;
+
     document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
-    document.getElementById(`step${currentStep}`).classList.add('active');
+    const activeStep = document.getElementById(`step${currentStep}`);
+    if (activeStep) {
+        activeStep.classList.add('active');
+    }
 
     const progress = (currentStep / totalSteps) * 100;
     progressBar.style.width = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', progress);
 }
 
-function nextStep() {
-    if (currentStep >= totalSteps) return;
-    
-    const currentStepElement = document.getElementById(`step${currentStep}`);
-    const requiredInputs = currentStepElement.querySelectorAll('[required]');
+function validateStep(stepNumber) {
+    const stepElement = document.getElementById(`step${stepNumber}`);
+    if (!stepElement) return false;
+    const requiredInputs = stepElement.querySelectorAll('[required]');
     let allValid = true;
     requiredInputs.forEach(input => {
         if (!input.value.trim()) {
@@ -25,14 +32,10 @@ function nextStep() {
             input.classList.remove('is-invalid');
         }
     });
-
     if (!allValid) {
         showToast('Please fill in all required fields.', 'warning');
-        return;
     }
-
-    currentStep++;
-    updateStepAndProgress();
+    return allValid;
 }
 
 function prevStep() {
@@ -41,17 +44,40 @@ function prevStep() {
     updateStepAndProgress();
 }
 
-function scrollToGenerator() { document.getElementById('generator').scrollIntoView({ behavior: 'smooth' }); }
+function nextStep() {
+    if (currentStep >= totalSteps) return;
+    
+    if (!validateStep(currentStep)) {
+        return;
+    }
+    currentStep++;
+    updateStepAndProgress();
+}
+
+function scrollToGenerator() {
+    const generatorEl = document.getElementById('generator');
+    if (generatorEl) {
+        generatorEl.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 function showPricing() { showToast('Pricing details coming soon!', 'info'); }
 function showDemo() { showToast('Demo video coming soon!', 'info'); }
 
 async function generateReadme() {
     if (currentStep !== 3) return; // Only generate from step 3
-    nextStep(); // Move to step 4
+
+    if (!validateStep(currentStep)) {
+        return; // Stop if validation fails
+    }
+
+    currentStep++;
+    updateStepAndProgress(); // Manually advance to the preview step
 
     const previewContainer = document.getElementById('readmePreview');
     previewContainer.innerHTML = '<div class="d-flex align-items-center p-4"><strong role="status">Generating with AI...</strong><div class="spinner-border ms-auto" aria-hidden="true"></div></div>';
     
+    // Simulate AI generation
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const projectName = document.getElementById('projectName').value || 'My Awesome Project';
@@ -65,12 +91,16 @@ async function generateReadme() {
 }
 
 function copyReadme() {
-    const readmeText = document.getElementById('readmePreview').innerText;
-    navigator.clipboard.writeText(readmeText).then(() => showToast('README copied to clipboard!', 'success'), () => showToast('Failed to copy.', 'danger'));
+    const readmePreview = document.getElementById('readmePreview');
+    if (!readmePreview) return;
+    navigator.clipboard.writeText(readmePreview.innerText).then(() => showToast('README copied to clipboard!', 'success'), () => showToast('Failed to copy.', 'danger'));
 }
 
 function downloadReadme() {
-    const readmeText = document.getElementById('readmePreview').innerText;
+    const readmePreview = document.getElementById('readmePreview');
+    if (!readmePreview) return;
+
+    const readmeText = readmePreview.innerText;
     const blob = new Blob([readmeText], { type: 'text/markdown' });
     const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'README.md' });
     document.body.appendChild(a);
@@ -86,13 +116,22 @@ function editReadme() {
 }
 
 function startOver() {
-    document.getElementById('readmeForm').reset();
+    const readmeForm = document.getElementById('readmeForm');
+    if (readmeForm) {
+        readmeForm.reset();
+    }
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     currentStep = 1;
     updateStepAndProgress();
-    document.getElementById('readmePreview').innerHTML = '<!-- Generated README will appear here -->';
-    progressBar.style.width = '25%';
-    progressBar.setAttribute('aria-valuenow', 25);
+    const readmePreview = document.getElementById('readmePreview');
+    if (readmePreview) {
+        readmePreview.innerHTML = '<!-- Generated README will appear here -->';
+    }
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+        progressBar.style.width = '25%';
+        progressBar.setAttribute('aria-valuenow', 25);
+    }
     showToast('Form has been reset.', 'info');
 }
 
@@ -100,6 +139,7 @@ function shareReadme() { showToast('Share functionality coming soon!', 'info'); 
 
 function showToast(message, type = 'primary') {
     const toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) return;
     const toastId = 'toast-' + Date.now();
     const toastHTML = `<div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true"><div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div></div>`;
     toastContainer.insertAdjacentHTML('beforeend', toastHTML);
@@ -109,24 +149,28 @@ function showToast(message, type = 'primary') {
     toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
 }
 
-// GitHub URL validation simulation
-const githubUrlInput = document.getElementById('githubUrl');
-const githubStatus = document.getElementById('githubStatus');
-let debounceTimer;
-githubUrlInput.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    const url = githubUrlInput.value.trim();
-    if (!url) {
-        githubStatus.innerHTML = '';
-        return;
-    }
-    githubStatus.innerHTML = '<div class="spinner-border spinner-border-sm text-secondary" role="status"></div>';
-    debounceTimer = setTimeout(() => {
-        if (/^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._]+$/.test(url)) {
-            githubStatus.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
-            showToast('Valid GitHub repository URL detected!', 'info');
-        } else {
-            githubStatus.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
-        }
-    }, 800);
-});
+// --- Initialization Function ---
+// This function is called from interactive_readme_pro.html after the form is fetched and loaded.
+function initializeGeneratorForm() {
+    // Set initial progress and step visibility
+    updateStepAndProgress();
+
+    // GitHub URL validation simulation
+    const githubUrlInput = document.getElementById('githubUrl');
+    const githubStatus = document.getElementById('githubStatus');
+    if (!githubUrlInput || !githubStatus) return;
+
+    let debounceTimer;
+    githubUrlInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const url = githubUrlInput.value.trim();
+        githubStatus.innerHTML = !url ? '' : '<div class="spinner-border spinner-border-sm text-secondary" role="status"></div>';
+        if (!url) return;
+
+        debounceTimer = setTimeout(() => {
+            const isValid = /^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._]+$/.test(url);
+            githubStatus.innerHTML = isValid ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+            if (isValid) showToast('Valid GitHub repository URL detected!', 'info');
+        }, 800);
+    });
+}
