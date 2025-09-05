@@ -234,25 +234,25 @@ function showToast(message, type = 'primary') {
 
 function generateBadges(data) {
     const badges = [];
-    const style = 'for-the-badge'; // 'flat', 'flat-square', 'plastic', 'social'
+    const style = 'for-the-badge'; // Other options: 'flat', 'flat-square', 'plastic', 'social'
+    const repoPathMatch = data.githubUrl ? data.githubUrl.match(/github\.com\/([^\/]+\/[^\/]+)/) : null;
+    const repoPath = repoPathMatch && repoPathMatch[1] ? repoPathMatch[1].replace(/\.git$/, '') : null;
 
-    // GitHub License Badge
-    if (data.githubUrl) {
-        const repoPathMatch = data.githubUrl.match(/github\.com\/([^\/]+\/[^\/]+)/);
-        if (repoPathMatch && repoPathMatch[1]) {
-            const repoPath = repoPathMatch[1].replace(/\.git$/, '');
-            if (data.license && data.license !== 'Custom') {
-                badges.push(`[!License](https://github.com/${repoPath}/blob/main/LICENSE)`);
-            }
+    // License Badge
+    if (data.license && data.license !== 'Custom') {
+        const licenseFormatted = encodeURIComponent(data.license.replace('-', '--'));
+        if (repoPath) {
+            // Dynamic badge from GitHub API
+            badges.push(`[!License](https://github.com/${repoPath}/blob/main/LICENSE)`);
+        } else {
+            // Static fallback badge
+            badges.push(`!License`);
         }
-    } else if (data.license && data.license !== 'Custom') {
-        // Fallback license badge if no repo URL
-        const licenseFormatted = data.license.replace('-', '--');
-        badges.push(`!License`);
     }
 
     // Version Badge
     if (data.version) {
+        const versionFormatted = encodeURIComponent(data.version);
         badges.push(`!Version`);
     }
 
@@ -260,6 +260,7 @@ function generateBadges(data) {
     if (data.primaryLanguage && data.primaryLanguage !== 'Other') {
         const lang = encodeURIComponent(data.primaryLanguage);
         const logo = lang.toLowerCase();
+        const langColor = '239120'; // A generic green color
         badges.push(`!Language`);
     }
 
