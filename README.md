@@ -8,9 +8,6 @@ A powerful, privacy-focused web tool designed to help developers create high-qua
 
 **[➡️ Live Demo Here](https://jamesthegiblet.github.io/interactive-readme-generator-with-ai-pro/)**
 
-![Screenshot of the README Generator Tool](https://via.placeholder.com/800x400.png?text=App+Screenshot+Here)
-*(Replace the placeholder above with a real screenshot of your application)*
-
 ## ✨ Core Features
 
 This tool is more than just a template. It's an interactive and intelligent assistant for your documentation needs.
