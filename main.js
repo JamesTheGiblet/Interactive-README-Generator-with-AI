@@ -602,37 +602,6 @@ function setupGitHubValidation() {
     });
 }
 
-// --- Initialization Function ---
-function initializeGeneratorForm() {
-    // Set initial progress and step visibility
-    updateStepAndProgress();
-    
-    // Initialize dark mode
-    initializeDarkMode();
-    
-    // Setup GitHub URL validation
-    setupGitHubValidation();
-    
-    // Initialize analytics counter animation
-    setTimeout(animateCounters, 500); // Slight delay to ensure DOM is ready
-    
-    // Add smooth scrolling to all anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-    
-    console.log('Enhanced README Pro initialized successfully');
-}
-
 function initializeDarkMode() {
     // Check localStorage for saved preference
     const savedMode = localStorage.getItem('darkMode');
@@ -662,3 +631,107 @@ function initializeDarkMode() {
         }
     });
 }
+
+// --- Initialization Functions ---
+
+/**
+ * Initializes the entire application after the DOM is loaded.
+ */
+function initializeApp() {
+    // Initialize dark mode first as it affects the whole page
+    initializeDarkMode();
+    
+    // Setup the tool switcher and load the default tool
+    initializeToolSwitcher();
+    
+    // Initialize analytics counter animation
+    setTimeout(animateCounters, 500); // Slight delay to ensure DOM is ready
+    
+    // Add smooth scrolling to all anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    console.log('Enhanced README Pro initialized successfully');
+}
+
+/**
+ * Sets up the tool switching tabs and loads the default tool.
+ */
+function initializeToolSwitcher() {
+    const toolSwitcher = document.getElementById('tool-switcher');
+    if (!toolSwitcher) return;
+
+    const tabs = toolSwitcher.querySelectorAll('[data-bs-toggle="tab"]');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', event => {
+            const templateId = event.target.dataset.toolTemplate;
+            const initFunction = event.target.dataset.toolInit;
+            if (templateId) {
+                loadTool(templateId, initFunction);
+            }
+        });
+    });
+
+    // Load the default tool initially
+    const activeTab = toolSwitcher.querySelector('.nav-link.active');
+    if (activeTab) {
+        const templateId = activeTab.dataset.toolTemplate;
+        const initFunction = activeTab.dataset.toolInit;
+        if (templateId) {
+            loadTool(templateId, initFunction);
+        }
+    }
+}
+
+/**
+ * Loads a tool from a template into the main content area.
+ * @param {string} templateId The ID of the <template> element to load.
+ * @param {string} initFunctionName The name of the function to call to initialize the tool's scripts.
+ */
+function loadTool(templateId, initFunctionName) {
+    const toolContentArea = document.getElementById('tool-content-area');
+    const template = document.getElementById(templateId);
+
+    if (!toolContentArea || !template) {
+        console.error(`Tool content area or template with id '${templateId}' not found!`);
+        toolContentArea.innerHTML = `<div class="alert alert-danger" role="alert"><strong>Error:</strong> Could not load the tool. Template is missing.</div>`;
+        return;
+    }
+
+    const templateContent = template.content.cloneNode(true);
+    toolContentArea.innerHTML = ''; // Clear previous tool or spinner
+    toolContentArea.appendChild(templateContent);
+    
+    if (initFunctionName && typeof window[initFunctionName] === 'function') {
+        windowinitFunctionName;
+    }
+}
+
+/**
+ * Initializes JavaScript functionality specific to the generator form.
+ */
+function initializeGeneratorScripts() {
+    updateStepAndProgress();
+    setupGitHubValidation();
+}
+
+/**
+ * Initializes JavaScript functionality specific to the DID Manager tool.
+ */
+function initializeDidManagerScripts() {
+    console.log('DID Manager tool placeholder initialized.');
+    // Future JS for this tool will go here.
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
