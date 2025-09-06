@@ -151,28 +151,6 @@ function shareReadme() {
     }
 }
 
-function toggleDarkMode() {
-    darkMode = !darkMode;
-    const body = document.body;
-    const themeIcon = document.querySelector('.theme-toggle i');
-    
-    if (darkMode) {
-        body.classList.add('dark-mode');
-        if (themeIcon) {
-            themeIcon.className = 'bi bi-sun-fill';
-        }
-        localStorage.setItem('darkMode', 'true');
-        showToast('Dark mode enabled', 'info');
-    } else {
-        body.classList.remove('dark-mode');
-        if (themeIcon) {
-            themeIcon.className = 'bi bi-moon-fill';
-        }
-        localStorage.setItem('darkMode', 'false');
-        showToast('Light mode enabled', 'info');
-    }
-}
-
 function fallbackShare(readmeText) {
     // Create a temporary shareable link (simulate backend)
     const shareId = Math.random().toString(36).substring(2, 15);
@@ -490,6 +468,48 @@ function generateBadges(data, repoPath) {
     return badges.join(' ');
 }
 
+// --- Theme Management ---
+
+/**
+ * Updates the entire page theme (body class and icons). This function is safe to call on any page.
+ * @param {boolean} isDark - True for dark mode, false for light mode.
+ */
+function updateTheme(isDark) {
+    const body = document.body;
+    const themeIcon = document.querySelector('.theme-toggle i');
+
+    if (isDark) {
+        body.classList.add('dark-mode');
+        if (themeIcon) themeIcon.className = 'bi bi-sun-fill';
+    } else {
+        body.classList.remove('dark-mode');
+        if (themeIcon) themeIcon.className = 'bi bi-moon-fill';
+    }
+}
+
+/**
+ * Toggles the theme and saves the user's preference.
+ */
+function toggleDarkMode() {
+    darkMode = !document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', darkMode);
+    updateTheme(darkMode);
+    showToast(darkMode ? 'Dark mode enabled' : 'Light mode enabled', 'info');
+}
+
+/**
+ * Initializes the dark mode on page load based on saved preference or system settings.
+ */
+function initializeDarkMode() {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode !== null) {
+        darkMode = savedMode === 'true';
+    } else {
+        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    updateTheme(darkMode);
+}
+
 function getLanguageColor(language) {
     const colors = {
         'JavaScript': 'F7DF1E',
@@ -543,10 +563,31 @@ function animateCounters() {
 }
 
 function animateCounter(element) {
-    const target = element.textContent;
-    const numericValue = parseFloat(target.replace(/[^\d.]/g, ''));
-    const hasDecimal = target.includes('.');
-    const suffix = target.replace(/[\d.]/g, '');
+    const originalText = element.textContent;
+    const isRate = originalText.includes('/');
+    const isK = originalText.toLowerCase().includes('k');
+
+    let targetValue;
+    let suffix = '';
+
+    if (isRate) {
+        targetValue = parseFloat(originalText);
+        suffix = originalText.substring(originalText.indexOf('/'));
+    } else {
+        targetValue = parseFloat(originalText.replace(/,/g, ''));
+        if (isK) {
+            targetValue *= 1000;
+        }
+        suffix = originalText.replace(/[\d.,k]/gi, '');
+    }
+
+    if (isNaN(targetValue)) {
+        element.textContent = originalText; // Restore original if parsing fails
+        return;
+    }
+
+    const numericValue = targetValue;
+    const hasDecimal = originalText.includes('.');
     
     let current = 0;
     const increment = numericValue / 60; // 60 frames for smooth animation
@@ -554,10 +595,10 @@ function animateCounter(element) {
     const timer = setInterval(() => {
         current += increment;
         if (current >= numericValue) {
-            element.textContent = target;
+            element.textContent = originalText;
             clearInterval(timer);
         } else {
-            const displayValue = hasDecimal ? current.toFixed(1) : Math.floor(current);
+            const displayValue = hasDecimal ? current.toFixed(1) : Math.floor(current).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             element.textContent = displayValue + suffix;
         }
     }, 16); // ~60fps
@@ -602,36 +643,6 @@ function setupGitHubValidation() {
     });
 }
 
-function initializeDarkMode() {
-    // Check localStorage for saved preference
-    const savedMode = localStorage.getItem('darkMode');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Set initial state based on saved preference or system preference
-    darkMode = savedMode === 'true' || (savedMode === null && prefersDark);
-    
-    // Apply the theme
-    if (darkMode) {
-        document.body.classList.add('dark-mode');
-        const themeIcon = document.querySelector('.theme-toggle i');
-        if (themeIcon) {
-            themeIcon.className = 'bi bi-sun-fill';
-        }
-    }
-    
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (localStorage.getItem('darkMode') === null) {
-            darkMode = e.matches;
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-        }
-    });
-}
-
 // --- Initialization Functions ---
 
 /**
@@ -640,30 +651,55 @@ function initializeDarkMode() {
 function initializeApp() {
     // Initialize dark mode first as it affects the whole page
     initializeDarkMode();
-    
+
+    // Listen for system theme changes to auto-update if no preference is set
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (localStorage.getItem('darkMode') === null) {
+            darkMode = e.matches;
+            updateTheme(darkMode);
+        }
+    });
+
+    // --- Page-specific initializations ---
+    // Check if we are on the main page by looking for a unique element.
+    // If so, run the initializers for the main page's complex components.
+    if (document.getElementById('tool-switcher')) {
+        initializeMainPage();
+    }
+}
+
+function initializeMainPage() {
     // Setup the tool switcher and load the default tool
     initializeToolSwitcher();
+    // Initialize scroll-triggered animations for sections
+    initializeScrollAnimations();
+    
+    // Initialize scroll-triggered effects (back-to-top button, navbar shrink)
+    initializeScrollEffects();
     
     // Initialize analytics counter animation
     setTimeout(animateCounters, 500); // Slight delay to ensure DOM is ready
     
     // Add smooth scrolling to all anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    document.querySelectorAll('a[href^="#"]:not([data-bs-toggle])').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
+            // Ensure the href is more than just a '#' to avoid errors and scroll-to-top behavior
+            if (href.length > 1) {
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
     
     console.log('Enhanced README Pro initialized successfully');
 }
-
 /**
  * Sets up the tool switching tabs and loads the default tool.
  */
@@ -714,7 +750,7 @@ function loadTool(templateId, initFunctionName) {
     toolContentArea.appendChild(templateContent);
     
     if (initFunctionName && typeof window[initFunctionName] === 'function') {
-        windowinitFunctionName;
+        window[initFunctionName]();
     }
 }
 
@@ -724,6 +760,69 @@ function loadTool(templateId, initFunctionName) {
 function initializeGeneratorScripts() {
     updateStepAndProgress();
     setupGitHubValidation();
+}
+
+/**
+ * Initializes animations for elements that should fade in on scroll.
+ */
+function initializeScrollAnimations() {
+    const scrollElements = document.querySelectorAll('.scroll-fade');
+
+    if (!scrollElements.length) return;
+
+    // Apply staggered delay to feature cards specifically
+    const featureCards = document.querySelectorAll('#features .row .scroll-fade');
+    featureCards.forEach((card, index) => {
+        card.style.transitionDelay = `${index * 100}ms`;
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // When the element is in view, add the 'is-visible' class to trigger the animation
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                // Stop observing the element after it has become visible
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1, // Trigger when 10% of the element is visible
+        rootMargin: '0px 0px -50px 0px' // Start animation a bit before it's fully in view
+    });
+
+    scrollElements.forEach(el => observer.observe(el));
+}
+
+/**
+ * Initializes effects that trigger on scroll, like the back-to-top button and navbar shrinking.
+ */
+function initializeScrollEffects() {
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    const navbar = document.querySelector('.navbar');
+    if (!navbar && !backToTopBtn) return;
+
+    // Handle scroll events
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+
+        // Back to top button visibility
+        if (backToTopBtn) {
+            if (scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
+
+        // Navbar shrink effect
+        if (navbar) {
+            if (scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        }
+    });
 }
 
 /**

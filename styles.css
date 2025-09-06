@@ -62,7 +62,7 @@ body {
     background-color: var(--navbar-bg);
     box-shadow: 0 2px 10px var(--shadow-light);
     padding: 15px 0;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -70,6 +70,7 @@ body {
     font-weight: 700;
     color: var(--primary);
     font-size: 1.5rem;
+    transition: font-size 0.3s ease;
 }
 
 .nav-link {
@@ -78,6 +79,15 @@ body {
     margin: 0 10px;
     cursor: pointer;
     transition: color 0.3s ease;
+}
+
+/* Scrolled state for navbar */
+.navbar.navbar-scrolled {
+    padding: 8px 0;
+}
+
+.navbar.navbar-scrolled .navbar-brand {
+    font-size: 1.25rem;
 }
 
 .nav-link:hover {
@@ -699,6 +709,39 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
 }
 
+/* Back to Top Button */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    text-decoration: none;
+    box-shadow: 0 5px 15px var(--shadow-medium);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+    z-index: 1000;
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background-color: var(--primary-dark);
+}
+
 /* Selection styling */
 ::selection {
     background-color: var(--primary);
@@ -743,11 +786,6 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
     outline-offset: 2px;
 }
 
-/* Smooth transitions for theme changes */
-* {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -762,6 +800,35 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
     .floating {
         animation: none;
     }
+}
+
+/* Fade-in animation on page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+}
+
+/* Animation on scroll */
+.scroll-fade {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-fade.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Tool Switcher Tabs */
